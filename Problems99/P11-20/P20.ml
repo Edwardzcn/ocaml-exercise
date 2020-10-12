@@ -11,3 +11,13 @@ let remove_at num list =
 remove_at 1 ["a";"b";"c";"d"];;
 remove_at 0 ["a";"b";"c";"d"];;
 remove_at 10 ["a"];;
+
+(*Easy but not tail recursive*)
+
+let rec remove_at_ref num = function
+  | [] ->[]
+  | head::tail -> if num = 0 then tail else head::remove_at_ref (num-1) tail;;
+
+remove_at_ref 1 ["a";"b";"c";"d"];;
+remove_at_ref 0 ["a";"b";"c";"d"];;
+remove_at_ref 10 ["a"];;
