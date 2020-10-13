@@ -1,12 +1,22 @@
 (* Determine the prime factors of a given positive integer *)
-let factors num =
-  let rec gcd x y =
-    if y = 0 then x else gcd y (x mod y)
-  in
-  let coprime x y = gcd x y = 1
-  in
+let factors num =               (* all factors  *)
   let rec aux n acc  =
-    if num mod n = 0 then aux (n-1) (n::acc)
-        else aux (n-1) acc;;
-  in
-  aux num [];;
+    match n with
+    | 0 -> acc
+    | i ->
+      if num mod i = 0 then aux (i-1) (i::acc)
+      else aux (i-1) acc
+  in aux num [];;
+
+factors 315;;
+
+let prime_factors num =
+  let rec aux d num acc =
+    match num with
+    | 1 -> acc
+    | i ->
+      if num mod d = 0 then aux d (num/d) (d::acc)
+      else aux (d+1) num acc
+  in List.rev(aux 2 num []);;
+
+prime_factors 315;;
