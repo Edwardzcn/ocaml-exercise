@@ -1,12 +1,21 @@
 # Some Tips
 
-[Ocaml Code Problems](https://github.com/yuanqing/code-problems)
+## Books
+
+
+1. [Software Foundations](https://softwarefoundations.cis.upenn.edu/lf-current/toc.html) A broad introduction to the mathematical underpinnings of reliable software. Proof script of the Coq proof assistant.
+
+2. [Proofs and Algorithms](https://b-ok.global/dl/864225/29e2da) An introduction to logic and computability. 
+
+3. [Software Reliability Methods](https://b-ok.global/dl/2162258/fa46b1) All about formal methods.
+
+## Websites
+
+[Ocaml Code Problems (for test) ](https://github.com/yuanqing/code-problems)
 
 [Survey of category theory in Coq](https://coq.discourse.group/t/survey-of-category-theory-in-coq/371)
 
-[Soft ware foundations](https://softwarefoundations.cis.upenn.edu/lf-current/toc.html)
-
-[Overview of logic | ANU](chrome-extension://cdonnmffkdaoajfknoeeecmchibpmkmg/assets/pdf/web/viewer.html?file=https%3A%2F%2Fcs.anu.edu.au%2Fcourses%2Fcomp4630%2Flectures%2F01Overview.pdf)
+[Overview of logic | ANU](https://cs.anu.edu.au/courses/comp4630/lectures/)
 
 ## Pioneers
 

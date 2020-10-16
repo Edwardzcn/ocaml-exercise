@@ -16,8 +16,14 @@ This folder record my reading notes (code included) on [Real World OCaml](https:
 - Time: -
 - Progress: 4/25(Chap)
 
-## Others
+## Others Tips
 
 Other tips on learning Coq or category theory.
+
+- Books
+- Websites
+- Pioneers
+
+[Other Tips](sometips.md)
 
 <!-- TODO -->
