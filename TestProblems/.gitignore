@@ -1,0 +1,10 @@
+.DS_Store
+*.annot
+*.cache
+*.cm*
+*.log
+*.mli
+*.o
+*.out
+coverage/
+sandbox/
