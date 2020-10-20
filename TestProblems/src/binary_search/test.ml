@@ -1,4 +1,4 @@
-open Binary_search
+open Binary_search_eddy
 open OUnit2
 
 let () = run_test_tt_main ("binary_search compare xs y" >::: [

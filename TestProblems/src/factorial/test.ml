@@ -1,5 +1,5 @@
 open Big_int
-open Factorial
+open Factorial_eddy
 open OUnit2
 
 let () = run_test_tt_main ("factorial n" >::: [

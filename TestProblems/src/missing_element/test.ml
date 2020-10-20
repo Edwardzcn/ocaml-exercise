@@ -1,4 +1,4 @@
-open Missing_element
+open Missing_element_eddy
 open OUnit2
 
 let () = run_test_tt_main ("missing_element xs ys" >::: [
