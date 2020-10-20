@@ -1,4 +1,4 @@
-open Odd_occurring_element
+open Odd_occurring_element_eddy
 open OUnit2
 
 let () = run_test_tt_main ("odd_occurring_element xs" >::: [

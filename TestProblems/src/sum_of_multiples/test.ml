@@ -1,4 +1,4 @@
-open Sum_of_multiples
+open Sum_of_multiples_eddy
 open OUnit2
 
 let () = run_test_tt_main ("sum_of_multiples xs n" >::: [

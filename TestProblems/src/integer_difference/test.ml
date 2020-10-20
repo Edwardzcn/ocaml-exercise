@@ -8,8 +8,9 @@ let () = run_test_tt_main ("integer_difference n xs" >::: [
   );
 
   "non-empty `xs`" >:: (fun _ ->
-    assert_equal 4 (integer_difference 2 [1; 1; 3; 3]);
-    assert_equal 3 (integer_difference 4 [1; 1; 5; 6; 9; 16; 27])
+      assert_equal 4 (integer_difference 2 [1; 1; 3; 3]);
+      assert_equal 3 (integer_difference 4 [1; 1; 5; 6; 9; 16; 27]);
+      assert_equal 5 (integer_difference 5 [1;2;3;4;5]);
   );
 
 ])

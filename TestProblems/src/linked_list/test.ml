@@ -1,4 +1,4 @@
-open Linked_list
+open Linked_list_eddy
 open OUnit2
 
 let () = run_test_tt_main ("linked list" >::: [
