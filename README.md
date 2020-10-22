@@ -11,7 +11,7 @@ The directory [Problems99](Problems) include my code exercise of [99 Problems so
 
 ## Real World Ocaml
 
-This directory [RealWorld](RealWrold) record my reading notes (code included) on [Real World OCaml](https://dev.realworldocaml.org/install.html).
+This directory [RealWorld](RealWorld) record my reading notes (code included) on [Real World OCaml](https://dev.realworldocaml.org/install.html).
 
 - Time: -
 - Progress: 4/25(Chap)
@@ -21,7 +21,7 @@ This directory [RealWorld](RealWrold) record my reading notes (code included) on
 This directory [TestProblems](TestProblems) include ocaml code-problems recommended by my mentor which merge from [code-problems](https://github.com/yuanqing/code-problems).
 
 - Time: 3 days
-- Progress: 4/43
+- Progress: 12/43
 
 The problems are listed in the directory.
 

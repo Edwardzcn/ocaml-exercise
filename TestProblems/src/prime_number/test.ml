@@ -1,5 +1,5 @@
 open OUnit2
-open Prime_number
+open Prime_number_eddy
 
 let () = run_test_tt_main ("prime_number n" >::: [
 
