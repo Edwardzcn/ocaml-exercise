@@ -1,4 +1,4 @@
-open Tree_traversal
+open Tree_traversal_eddy
 open OUnit2
 
 let x =

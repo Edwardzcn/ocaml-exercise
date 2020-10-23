@@ -4,7 +4,7 @@ let binary_search (compare: 'a -> 'a -> int) (xs: 'a list) (y: 'a) : int =
     else
       let mid = (low+high) lsr 1 in
       match compare y (List.nth xs mid) with
-      | -1 -> aux low mid
+      | -1 -> aux low (mid-1)
       | 1 -> aux (mid+1) high
       | _ -> mid
   in

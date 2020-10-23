@@ -1,5 +1,5 @@
 open OUnit2
-open Sum_of_list_plus_one
+open Sum_of_list_plus_one_eddy
 
 let () = run_test_tt_main ("sum_of_list_plus_one xx" >::: [
 
