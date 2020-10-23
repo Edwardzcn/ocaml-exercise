@@ -131,21 +131,21 @@ If there is ambiguity (eg. when we are dealing with many variables of the same t
 
 First, install [ocamlfind](https://opam.ocaml.org/packages/ocamlfind/ocamlfind.1.5.5/), [oUnit](https://opam.ocaml.org/packages/ounit/ounit.2.0.0/) (for tests), and [Bisect](https://opam.ocaml.org/packages/bisect/bisect.1.3/) (for test coverage) with OPAM:
 
-```
-$ opam install ocamlfind ounit bisect
+```Bash
+opam install ocamlfind ounit bisect
 ```
 
 Then, grab this repository:
 
-```
-$ git clone https://github.com/yuanqing/code-problems
+```Bash
+git clone https://github.com/yuanqing/code-problems
 ```
 
 ### Run all the tests
 
-```
-$ cd code-problems/src
-$ make
+```Bash
+cd code-problems/src
+make
 ```
 
 Use `make coverage` to run the tests and generate coverage reports (output to `coverage/`).
@@ -154,8 +154,8 @@ Use `make coverage` to run the tests and generate coverage reports (output to `c
 
 &hellip;for example, for the [binary search](src/binary_search) problem:
 
-```
-$ make binary_search/test
+```Bash
+make binary_search/test
 ```
 
 Use `make binary_search/coverage` to run the test and generate coverage reports (output to `coverage/`).
@@ -164,8 +164,8 @@ Use `make binary_search/coverage` to run the test and generate coverage reports 
 
 To remove all compiled files and other debris:
 
-```
-$ make clean
+```Bash
+make clean
 ```
 
 ## Known issues

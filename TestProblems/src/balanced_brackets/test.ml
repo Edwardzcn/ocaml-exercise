@@ -1,4 +1,4 @@
-open Balanced_brackets
+open Balanced_brackets_eddy
 open OUnit2
 
 let () = run_test_tt_main ("balanced_brackets str" >::: [

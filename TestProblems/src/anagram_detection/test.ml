@@ -1,10 +1,11 @@
-open Anagram_detection
+open Anagram_detection_eddy
 open OUnit2
 
 let () = run_test_tt_main ("anagram_detection parent child" >::: [
 
   "empty `parent`" >:: (fun _ ->
-    assert_equal 0 (anagram_detection "" "dAn");
+        assert_equal 0 (anagram_detection "" "dAn");
+        assert_equal 3 (anagram_detection "dAndnaA" "dAn");
   );
 
   "empty `child`" >:: (fun _ ->

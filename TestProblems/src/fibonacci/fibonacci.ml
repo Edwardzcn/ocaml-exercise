@@ -1,12 +1,15 @@
+(* load for the toplevel *)
+(* #load "nums.cma";; *)
+(* actually we don't need ref of Hashtbl *)
+open Big_int;;
 let fib =
   (* Initialise a `ht` with the initial values. Because we have a closure,
      `ht` persists across calls to `fib`. *)
-  let ht = ref (Hashtbl.create 100) in
-  let _ = Hashtbl.add (!ht) 1 (Big_int.big_int_of_int 0) in
-  let _ = Hashtbl.add (!ht) 2 (Big_int.big_int_of_int 1) in
+  let ht = Hashtbl.create 100 in
+  let _ = Hashtbl.add ht 1 (Big_int.big_int_of_int 0) in
+  let _ = Hashtbl.add ht 2 (Big_int.big_int_of_int 1) in
   let max = ref 3 in
   fun (n:int) ->
-    let ht = !ht in
     if n < 1 then
       failwith "n < 1"
     else
