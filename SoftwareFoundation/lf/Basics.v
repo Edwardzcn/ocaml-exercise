@@ -1108,10 +1108,15 @@ Proof.
 Theorem plus_id_exercise : forall n m o : nat,
   n = m -> m = o -> n + m = m + o.
 Proof.
-  (* FILL IN HERE *) Admitted.
-(** [] *)
+  intros n m o.
+  intros H1.
+  intros H2.
+  rewrite -> H1.
+  rewrite <- H2.
+  reflexivity.
+Qed.
 
-(** The [Admitted] command tells Coq that we want to skip trying
+  (** The [Admitted] command tells Coq that we want to skip trying
     to prove this theorem and just accept it as a given.  This can be
     useful for developing longer proofs, since we can state subsidiary
     lemmas that we believe will be useful for making some larger
@@ -1156,9 +1161,12 @@ Proof.
 Theorem mult_n_1 : forall p : nat,
   p * 1 = p.
 Proof.
-  (* FILL IN HERE *) Admitted.
-
-(** [] *)
+  intros p.
+  rewrite <- mult_n_Sm.
+  rewrite <- mult_n_O.
+  simpl.
+  reflexivity.
+Qed.
 
 (* ################################################################# *)
 (** * Proof by Case Analysis *)
@@ -1176,6 +1184,19 @@ Proof.
   intros n.
   simpl.  (* does nothing! *)
 Abort.
+
+(* my exercise *)
+(* I try the case analysis but it fails with destruct, i need induction *)
+Theorem plus_1_r : forall n : nat, (n+1) = S n.
+Proof.
+  intros.
+  simpl.
+  induction n.                  (* induction *)
+  - reflexivity.
+  - simpl.
+    rewrite -> IHn.
+    reflexivity.
+Qed.
 
 (** The reason for this is that the definitions of both [eqb]
     and [+] begin by performing a [match] on their first argument.
@@ -1199,7 +1220,7 @@ Theorem plus_1_neq_0 : forall n : nat,
 Proof.
   intros n. destruct n as [| n'] eqn:E.
   - reflexivity.
-  - reflexivity.   Qed.
+  - simpl. reflexivity.   Qed.
 
 (** The [destruct] generates _two_ subgoals, which we must then
     prove, separately, in order to get Coq to accept the theorem.
@@ -1348,9 +1369,21 @@ Qed.
 Theorem andb_true_elim2 : forall b c : bool,
   andb b c = true -> c = true.
 Proof.
-  (* FILL IN HERE *) Admitted.
-(** [] *)
-
+  intros b c.
+  destruct b eqn:Eb.
+  {
+    simpl.
+    intros H.
+    rewrite <- H.
+    reflexivity.
+  }
+  {
+    simpl.
+    destruct c eqn:Ec.
+    - simpl. reflexivity.
+    - intros H. rewrite -> H. reflexivity.
+  }
+Qed.
 (** Before closing the chapter, let's mention one final
     convenience.  As you may have noticed, many proofs perform case
     analysis on a variable right after introducing it:
@@ -1389,9 +1422,10 @@ Qed.
 Theorem zero_nbeq_plus_1 : forall n : nat,
   0 =? (n + 1) = false.
 Proof.
-  (* FILL IN HERE *) Admitted.
-(** [] *)
-
+  intros [|n].
+  - simpl. reflexivity.
+  - rewrite -> plus_1_r. simpl. reflexivity.
+Qed.
 (* ================================================================= *)
 (** ** More on Notation (Optional) *)
 
@@ -1442,7 +1476,6 @@ Notation "x * y" := (mult x y)
 (** ** Fixpoints and Structural Recursion (Optional) *)
 
 (** Here is a copy of the definition of addition: *)
-
 Fixpoint plus' (n : nat) (m : nat) : nat :=
   match n with
   | O => m
@@ -1454,7 +1487,8 @@ Fixpoint plus' (n : nat) (m : nat) : nat :=
     performing a _structural recursion_ over the argument [n] -- i.e.,
     that we make recursive calls only on strictly smaller values of
     [n].  This implies that all calls to [plus'] will eventually
-    terminate.  Coq demands that some argument of _every_ [Fixpoint]
+    terminate.
+Coq demands that some argument of _every_ [Fixpoint]
     definition is "decreasing."
 
     This requirement is a fundamental feature of Coq's design: In
