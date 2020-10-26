@@ -669,6 +669,8 @@ End NatPlayground.
     the "unary" notation defined by the constructors [S] and [O].  Coq
     prints numbers in decimal form by default: *)
 
+
+
 Check (S (S (S (S O)))).
 (* ===> 4 : nat *)
 
@@ -680,6 +682,9 @@ Definition minustwo (n : nat) : nat :=
   end.
 
 Compute (minustwo 4).
+(* Equal to minustwo S(S(S(S(O)))) *)
+Compute (minustwo (S(S(S(S O))))).
+
 (* ===> 2 : nat *)
 
 (** The constructor [S] has the type [nat -> nat], just like functions
@@ -788,8 +793,14 @@ Fixpoint minus (n m:nat) : nat :=
   | S _ , O    => n
   | S n', S m' => minus n' m'
   end.
+(* test minus *)
+
+Check minus.
+Compute minus 12 5.
 
 End NatPlayground2.
+
+
 
 Fixpoint exp (base power : nat) : nat :=
   match power with
@@ -799,23 +810,32 @@ Fixpoint exp (base power : nat) : nat :=
 
 (** **** Exercise: 1 star, standard (factorial) 
 
-    Recall the standard mathematical factorial function:
+Recall the standard mathematical factorial function:
 
        factorial(0)  =  1
        factorial(n)  =  n * factorial(n-1)     (if n>0)
 
     Translate this into Coq. *)
 
-Fixpoint factorial (n:nat) : nat
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Fixpoint factorial (n:nat) : nat :=
+  match n with
+  | O => 1
+  | S p => mult (S p) (factorial p)
+  end.
+
 
 Example test_factorial1:          (factorial 3) = 6.
-(* FILL IN HERE *) Admitted.
-Example test_factorial2:          (factorial 5) = (mult 10 12).
-(* FILL IN HERE *) Admitted.
-(** [] *)
+Proof.
+  simpl.
+  reflexivity.
+Qed.
 
-(** Again, we can make numerical expressions easier to read and write
+Example test_factorial2:          (factorial 5) = (mult 10 12).
+Proof.
+  simpl.
+  reflexivity.
+Qed.
+  (** Again, we can make numerical expressions easier to read and write
     by introducing notations for addition, multiplication, and
     subtraction. *)
 
@@ -830,6 +850,7 @@ Notation "x * y" := (mult x y)
                        : nat_scope.
 
 Check ((0 + 1) + 1) : nat.
+
 
 (** (The [level], [associativity], and [nat_scope] annotations
     control how these notations are treated by Coq's parser.  The
@@ -860,6 +881,9 @@ Fixpoint eqb (n m : nat) : bool :=
             | S m' => eqb n' m'
             end
   end.
+
+
+
 
 (** Similarly, the [leb] function tests whether its first argument is
     less than or equal to its second argument, yielding a boolean. *)
@@ -905,18 +929,30 @@ Proof. simpl. reflexivity.  Qed.
     function.  (It can be done with just one previously defined
     function, but you can use two if you want.) *)
 
-Definition ltb (n m : nat) : bool
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
-
+Definition ltb (n m : nat) : bool :=
+  negb (n =? m) && (n <=? m)
+.
 Notation "x <? y" := (ltb x y) (at level 70) : nat_scope.
 
 Example test_ltb1:             (ltb 2 2) = false.
-(* FILL IN HERE *) Admitted.
+Proof.
+  simpl.
+  reflexivity.
+Qed.
+
+
 Example test_ltb2:             (ltb 2 4) = true.
-(* FILL IN HERE *) Admitted.
+Proof.
+  simpl.
+  reflexivity.
+Qed.
+
 Example test_ltb3:             (ltb 4 2) = false.
-(* FILL IN HERE *) Admitted.
-(** [] *)
+Proof.
+  simpl.
+  reflexivity.
+Qed.
+
 
 (* ################################################################# *)
 (** * Proof by Simplification *)
