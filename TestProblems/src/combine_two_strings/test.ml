@@ -1,4 +1,4 @@
-open Combine_two_strings
+open Combine_two_strings_eddy
 open OUnit2
 
 let () = run_test_tt_main ("combine_two_strings x y z" >::: [
