@@ -107,6 +107,18 @@ Definition next_weekday (d:day) : day :=
     [Compute] to evaluate a compound expression involving
     [next_weekday]. *)
 
+(* My Definition and test *)
+Definition next_2_weekday pd : day :=
+  match pd with
+  | monday => wednesday
+  | tuesday => thursday
+  | wednesday => friday
+  | thursday => saturday
+  | friday => sunday
+  | saturday => monday
+  | sunday => tuesday
+  end.
+
 Compute (next_weekday friday).
 (* ==> monday : day *)
 
@@ -295,17 +307,31 @@ Proof. simpl. reflexivity. Qed.
     function should return [true] if either or both of its inputs are
     [false]. *)
 
-Definition nandb (b1:bool) (b2:bool) : bool
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Definition nandb (b1:bool) (b2:bool) : bool :=
+  (* negb (andb b1 b2).            (* first method  *) *)
+  match b1 with
+  | true => negb b2
+  | false => true
+  end.
 
 Example test_nandb1:               (nandb true false) = true.
-(* FILL IN HERE *) Admitted.
+Proof.
+  simpl. reflexivity.
+Qed.
+
 Example test_nandb2:               (nandb false false) = true.
-(* FILL IN HERE *) Admitted.
+Proof.
+  simpl. reflexivity.
+Qed.
 Example test_nandb3:               (nandb false true) = true.
-(* FILL IN HERE *) Admitted.
+Proof.
+  simpl. reflexivity.
+Qed.
 Example test_nandb4:               (nandb true true) = false.
-(* FILL IN HERE *) Admitted.
+Proof.
+  simpl. reflexivity.
+Qed.
+
 (** [] *)
 
 (** **** Exercise: 1 star, standard (andb3) 
@@ -314,17 +340,34 @@ Example test_nandb4:               (nandb true true) = false.
     return [true] when all of its inputs are [true], and [false]
     otherwise. *)
 
-Definition andb3 (b1:bool) (b2:bool) (b3:bool) : bool
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Definition andb3 (b1:bool) (b2:bool) (b3:bool) : bool :=
+  match b1 with
+  | true => andb b2 b3
+  | false => false
+  end.
 
 Example test_andb31:                 (andb3 true true true) = true.
-(* FILL IN HERE *) Admitted.
+Proof.
+  simpl. reflexivity.
+Qed.
+
 Example test_andb32:                 (andb3 false true true) = false.
-(* FILL IN HERE *) Admitted.
+Proof.
+  simpl.
+  reflexivity.  
+Qed.
+
 Example test_andb33:                 (andb3 true false true) = false.
-(* FILL IN HERE *) Admitted.
+Proof.
+  simpl.
+  reflexivity.
+Qed.
+
 Example test_andb34:                 (andb3 true true false) = false.
-(* FILL IN HERE *) Admitted.
+Proof.
+  simpl.
+  reflexivity.
+Qed.
 (** [] *)
 
 (* ================================================================= *)
@@ -340,6 +383,9 @@ Check true.
 (** If the expression after [Check] is followed by a colon and a type,
     Coq will verify that the type of the expression matches the given
     type and halt with an error if not. *)
+
+Check (andb3 true false (nandb false false))
+  : bool.
 
 Check true
     : bool.
@@ -406,7 +452,7 @@ Inductive color : Type :=
 (** In particular, the definitions of [rgb] and [color] say
     which constructor expressions belong to the sets [rgb] and
     [color]:
-
+10
     - [red], [green], and [blue] belong to the set [rgb];
     - [black] and [white] belong to the set [color];
     - if [p] is a constructor expression belonging to the set [rgb],
@@ -514,6 +560,7 @@ End TuplePlayground.
     natural numbers does not interfere with the one from the
     standard library.  In the rest of the book, we'll want to use
     the standard library's. *)
+
 
 Module NatPlayground.
 
