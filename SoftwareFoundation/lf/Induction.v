@@ -1,3 +1,4 @@
+
 (** * Induction: Proof by Induction *)
 
 (* ################################################################# *)
@@ -204,25 +205,73 @@ Proof.
 Theorem mult_0_r : forall n:nat,
   n * 0 = 0.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros.
+  induction n.
+  - simpl. reflexivity.
+  - simpl. rewrite -> IHn. reflexivity.
+Qed.
 
 Theorem plus_n_Sm : forall n m : nat,
   S (n + m) = n + (S m).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n m.
+  induction n as [| n' IHn'].
+  - (* Case [n=0] *)
+    Print plus.
+    Print Nat.add.
+    simpl. (* By the definition of Nat.add we can match 0 on both sides and drp the 0*)
+    reflexivity.
+  - (* Case [n=Sn'] *)
+    (* We must show that [S (Sn' + m) = Sn' + Sm] *)
+    Print Nat.add.
+    (* Here as match with second rule in Nat.add simpl with unfold the S (n' m) on the left and S(n' + Sm)*)
+    simpl.
+    rewrite -> IHn'. reflexivity.
+Qed.
 
+
+(* A little bit hard to be at first *)
 Theorem plus_comm : forall n m : nat,
   n + m = m + n.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n m.
+  induction n as [| n' IHn'].
+  - (* Case [n=0] *)
+    (* By the definition of plus simpl. match 0 so we can drop 0 on the left *)
+    simpl.
+    (* rewrite plus_n_0 as it gives n = n + 0 *)
+    rewrite <- plus_n_O. reflexivity.
+  - (* Case [n= Sn'] *)
+    (* By the definition simpl. will unfold the left *)
+    simpl.
+    Print plus_n_Sm.
+    (* plus_n_Sm tells forall n m in nat S (n + m) = n + S m *)
+    rewrite -> IHn'.
+    rewrite <- plus_n_Sm.
+    reflexivity.
+Qed.
 
 Theorem plus_assoc : forall n m p : nat,
   n + (m + p) = (n + m) + p.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n m p.
+  induction n as [| n' IHn'].
+  - (* Case [n=0] *)
+    (* simpl. drop 0 of both sides *)
+    simpl. reflexivity.
+  - (* Case [n=Sn'] *)
+    simpl.
+    (* simpl. use the definition of plus once on the left and twice on the right 
+    Left:
+       [simpl] will replace [S n' + (m+p)] with [S (n' + (m+p))] on the left hand side of the equation. 
+    Right:
+       [simpl] will first replace [S n' + m + p] with [S (n'+m) + p] which is really [S (n' + m + p)] *)
+    rewrite -> IHn'.
+    reflexivity.
+  Qed.
 (** [] *)
 
-(** **** Exercise: 2 stars, standard (double_plus) 
+(** **** Exercise: 2 stars, standard (double_plus)
 
     Consider the following function, which doubles its argument: *)
 
@@ -232,11 +281,22 @@ Fixpoint double (n:nat) :=
   | S n' => S (S (double n'))
   end.
 
+
 (** Use induction to prove this simple fact about [double]: *)
 
 Lemma double_plus : forall n, double n = n + n .
 Proof.
-  (* FILL IN HERE *) Admitted.
+  induction n as [| n' IHn'].
+  - simpl. reflexivity.
+  - simpl. rewrite -> IHn'.
+    (* Search for proper theorems *)
+    Search "plus_n".
+    Print plus_n_Sm.
+    (* With the help of plus_n_Sm, rewrite the right *)
+    rewrite <- plus_n_Sm.
+    simpl.
+    reflexivity.
+Qed.
 (** [] *)
 
 (** **** Exercise: 2 stars, standard, optional (evenb_S) 
@@ -251,7 +311,18 @@ Proof.
 Theorem evenb_S : forall n : nat,
   evenb (S n) = negb (evenb n).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  induction n as [| n' IHn'].
+  - simpl. reflexivity.
+  - rewrite -> IHn'.
+    Print evenb.
+    Print negb_involutive.
+    simpl.
+    (* By the definition of evenb S (S n') => evenb n' , so [simpl] will replace the left with evenb n'. As for the right we search for negb_invlutive.*)
+    rewrite -> negb_involutive.
+    reflexivity.
+Qed.
+
+
 (** [] *)
 
 (** **** Exercise: 1 star, standard, optional (destruct_induction) 
@@ -372,7 +443,8 @@ Proof.
     single way of writing an informal proof that is guaranteed to
     convince every conceivable reader.
 
-    In practice, however, mathematicians have developed a rich set of
+    In practice, however,
+ mathematicians have developed a rich set of
     conventions and idioms for writing about complex mathematical
     objects that -- at least within a certain community -- make
     communication fairly reliable.  The conventions of this stylized
@@ -487,19 +559,48 @@ Definition manual_grade_for_plus_comm_informal : option (nat*string) := None.
 Theorem plus_swap : forall n m p : nat,
   n + (m + p) = m + (n + p).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros.
+  Print plus_assoc.
+  rewrite -> plus_assoc.
+  rewrite -> plus_assoc.
+  assert (H_swap : n+m = m+n).
+  - simpl. rewrite -> plus_comm. reflexivity.
+  - rewrite -> H_swap. reflexivity.
+Qed.
 
 (** Now prove commutativity of multiplication.  You will probably
     want to define and prove a "helper" theorem to be used
     in the proof of this one. Hint: what is [n * (1 + k)]? *)
+Print plus_comm.
+(* Helper theorem *)
+Theorem mult_n_Sm : forall n m : nat,
+    n * S m = n + n * m.
+Proof.
+  intros.
+  induction n as [| n' IHn'].
+  - simpl. reflexivity.
+  - simpl. rewrite -> IHn'.
+    (* Use plus_comm *)
+    rewrite -> plus_comm.
+    assert (AH : m + n' * m =  n'* m + m).
+    { rewrite -> plus_comm. reflexivity. }
+    rewrite -> AH.
+    rewrite -> plus_assoc.
+    reflexivity.
+Qed.
 
 Theorem mult_comm : forall m n : nat,
   m * n = n * m.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros.
+  induction n as [| n' IHn'].
+  - simpl. rewrite -> mult_0_r. reflexivity.
+  - simpl. rewrite -> mult_n_Sm. rewrite -> IHn'. reflexivity.
+Qed.
+
 (** [] *)
 
-(** **** Exercise: 3 stars, standard, optional (more_exercises) 
+(** **** Exercise: 3 stars, standard, optional (more_exercises)
 
     Take a piece of paper.  For each of the following theorems, first
     _think_ about whether (a) it can be proved using only
@@ -510,26 +611,52 @@ Proof.
     reflect before you hack!) *)
 
 Check leb.
+Print leb.
 
 Theorem leb_refl : forall n:nat,
   true = (n <=? n).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* think (c) requires induction before *)
+  intros n. induction n as [| n' IHn'].
+  - reflexivity.
+  - simpl. rewrite -> IHn'. reflexivity.
+Qed.
+
+Print  eqb.
 
 Theorem zero_nbeq_S : forall n:nat,
   0 =? (S n) = false.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* think (b) requires destruct / case analysis *)
+  (* but actually it only need (a) as S n match the first-second role *)
+  intros n. simpl. reflexivity.
+
+  (* destruct n as [| n']. *)
+  (* - simpl. reflexivity. *)
+  (* - simpl. reflexivity. *)
+Qed.
 
 Theorem andb_false_r : forall b : bool,
   andb b false = false.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* think (b) requires destruct / case analysis *)
+  intros b.
+  induction b.
+  - simpl. reflexivity.
+  - simpl. reflexivity.
+Qed.
 
 Theorem plus_ble_compat_l : forall n m p : nat,
   n <=? m = true -> (p + n) <=? (p + m) = true.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* think (c) *)
+  (* Amazing the O proof with origin H *)
+  intros .
+  induction p as [| p' IHp'].
+  - simpl. rewrite -> H. reflexivity.
+  - simpl. rewrite -> IHp'. reflexivity.
+Qed.
+
 
 Theorem S_nbeq_0 : forall n:nat,
   (S n) =? 0 = false.
