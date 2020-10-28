@@ -650,7 +650,7 @@ Theorem plus_ble_compat_l : forall n m p : nat,
   n <=? m = true -> (p + n) <=? (p + m) = true.
 Proof.
   (* think (c) *)
-  (* Amazing the O proof with origin H *)
+  (* Amazing! the case O is proved by origin H *)
   intros .
   induction p as [| p' IHp'].
   - simpl. rewrite -> H. reflexivity.
@@ -661,11 +661,26 @@ Qed.
 Theorem S_nbeq_0 : forall n:nat,
   (S n) =? 0 = false.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* think (c) *)
+  (* actually only need a, S n =? 0 [simpl] to false *)
+  intros.
+  Print eqb.
+  simpl.
+  reflexivity.
+Qed.
+
+
 
 Theorem mult_1_l : forall n:nat, 1 * n = n.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* think a with rewrite plus_n_0 *)
+  intros.
+  simpl.
+  rewrite <- plus_n_O.
+  reflexivity.
+Qed.
+
+
 
 Theorem all3_spec : forall b c : bool,
     orb
@@ -674,17 +689,64 @@ Theorem all3_spec : forall b c : bool,
                (negb c))
   = true.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* think (b) with case analysis *)
+  intros [] [].
+  - simpl. reflexivity.
+  - simpl. reflexivity.
+  - simpl. reflexivity.
+  - simpl. reflexivity.
+Qed.
+
+Theorem plus_comm_b_a_c : forall a b c: nat,
+    a + (b + c) = b + a + c.
+Proof.
+  intros.
+  rewrite -> plus_comm.
+  Print plus_assoc.
+  rewrite <- plus_assoc.
+  assert (AH : c + a = a + c).
+  { rewrite -> plus_comm. reflexivity. }
+  rewrite -> AH.
+  rewrite -> plus_assoc.
+  reflexivity.
+Qed.
+
 
 Theorem mult_plus_distr_r : forall n m p : nat,
   (n + m) * p = (n * p) + (m * p).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* think (c) induction *)
+  intros.
+  induction p as [| p' IHp'].
+  - simpl. rewrite -> mult_0_r. rewrite -> mult_0_r. rewrite -> mult_0_r.
+    simpl. reflexivity.
+  - simpl. rewrite mult_n_Sm. rewrite -> IHp'.
+    Print mult_n_Sm.
+    rewrite <- plus_assoc.
+    (* use pre theorem *)
+    assert (AH :  (m + (n * p' + m * p')) =  (n * p' + m + m * p')).
+    { rewrite -> plus_comm_b_a_c. reflexivity. }
+    rewrite -> AH.
+    rewrite <- plus_assoc.
+    rewrite <- mult_n_Sm.
+    rewrite -> plus_assoc.
+    rewrite <- mult_n_Sm.
+    reflexivity.
+Qed.
+
 
 Theorem mult_assoc : forall n m p : nat,
   n * (m * p) = (n * m) * p.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* think (c) induction *)
+  intros.
+  induction n as [| n' IHn'].
+  - simpl. reflexivity.
+  - simpl. rewrite -> IHn'.
+    (* Here we need mult_plus_distr_r *)
+    rewrite -> mult_plus_distr_r.
+    reflexivity.
+Qed.
 (** [] *)
 
 (** **** Exercise: 2 stars, standard, optional (eqb_refl)  *)
@@ -692,7 +754,12 @@ Proof.
 Theorem eqb_refl : forall n : nat,
   true = (n =? n).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* think (c) *)
+  induction n as [| n' IHn'].
+  - simpl. reflexivity.
+  - simpl. rewrite -> IHn'. reflexivity.
+Qed.
+
 (** [] *)
 
 (** **** Exercise: 2 stars, standard, optional (plus_swap') 
@@ -709,7 +776,18 @@ Proof.
 Theorem plus_swap' : forall n m p : nat,
   n + (m + p) = m + (n + p).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* This is my another try *)
+  (* intros. *)
+  (* rewrite -> plus_comm_b_a_c. *)
+  (* rewrite -> plus_assoc. *)
+  (* reflexivity. *)
+  intros.
+  rewrite -> plus_assoc.
+  rewrite -> plus_assoc.
+  replace (n+m) with (m+n).
+  - reflexivity.
+  - rewrite -> plus_comm. reflexivity.
+Qed.
 (** [] *)
 
 (** **** Exercise: 3 stars, standard, especially useful (binary_commute) 
@@ -738,7 +816,21 @@ Proof.
     want to change your original definitions to make the property
     easier to prove, feel free to do so! *)
 
-(* FILL IN HERE *)
+
+Print incr.
+Print bin_to_nat.
+Theorem bin_to_nat_pres_ince : forall n : bin,
+    bin_to_nat(incr n) = ( S (bin_to_nat n)).
+Proof.
+  intros.
+  induction n.
+  - simpl. reflexivity.
+  - simpl. remember (bin_to_nat n + bin_to_nat n) as t.
+    rewrite -> plus_comm. simpl. reflexivity.
+  - simpl. rewrite -> IHn. simpl. rewrite <- plus_assoc. remember  (bin_to_nat n) as t.
+    replace (t+1) with (S t).
+    reflexivity. rewrite -> plus_comm. reflexivity.
+Qed.
 
 (* Do not modify the following line: *)
 Definition manual_grade_for_binary_commute : option (nat*string) := None.
@@ -799,3 +891,4 @@ Definition manual_grade_for_binary_inverse_c : option (nat*string) := None.
 (** [] *)
 
 (* 2020-09-09 20:51 *)
+
