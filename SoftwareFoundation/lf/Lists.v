@@ -40,12 +40,15 @@ Compute (fst (pair 3 5)).
     [(x,y)] instead of [pair x y].  We can tell Coq to allow this with
     a [Notation] declaration. *)
 
+
 Notation "( x , y )" := (pair x y).
+
 
 (** The new notation can be used both in expressions and in pattern
     matches. *)
 
 Compute (fst (3,5)).
+Compute (snd ( 3, 5)).
 
 Definition fst' (p : natprod) : nat :=
   match p with
@@ -124,6 +127,7 @@ Theorem surjective_pairing : forall (p : natprod),
 Proof.
   intros p. destruct p as [n m]. simpl. reflexivity. Qed.
 
+
 (** Notice that, unlike its behavior with [nat]s, where it
     generates two subgoals, [destruct] generates just one subgoal
     here.  That's because [natprod]s can only be constructed in one
@@ -133,14 +137,16 @@ Proof.
 Theorem snd_fst_is_swap : forall (p : natprod),
   (snd p, fst p) = swap_pair p.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros. simpl. destruct p. simpl. reflexivity.
+Qed.
 (** [] *)
 
 (** **** Exercise: 1 star, standard, optional (fst_swap_is_snd)  *)
 Theorem fst_swap_is_snd : forall (p : natprod),
   fst (swap_pair p) = snd p.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros. destruct p. simpl. reflexivity.
+Qed.
 (** [] *)
 
 (* ################################################################# *)
@@ -217,6 +223,14 @@ Fixpoint repeat (n count : nat) : natlist :=
   | S count' => n :: (repeat n count')
   end.
 
+Fixpoint repeat_tai (n count:nat) (acc: natlist) : natlist  :=
+  match count with
+  | O => acc
+  | S count' => repeat_tai n count' (n :: acc)
+  end.
+
+Compute  repeat_tai 3 2 [].
+
 (* ----------------------------------------------------------------- *)
 (** *** Length *)
 
@@ -289,34 +303,67 @@ Proof. reflexivity. Qed.
     [countoddmembers] below. Have a look at the tests to understand
     what these functions should do. *)
 
-Fixpoint nonzeros (l:natlist) : natlist
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Fixpoint nonzeros (l:natlist) : natlist :=
+  match l with
+  | [] => []
+  | 0 :: t => nonzeros t
+  | a :: t => a :: (nonzeros t)
+  end.
+
 
 Example test_nonzeros:
   nonzeros [0;1;0;2;3;0;0] = [1;2;3].
-  (* FILL IN HERE *) Admitted.
+Proof.
+  simpl.
+  reflexivity.
+Qed.
 
-Fixpoint oddmembers (l:natlist) : natlist
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+
+Fixpoint oddmembers (l:natlist) : natlist :=
+  match l with
+  | [] => []
+  | h :: t => match oddb h with
+            | true => h :: oddmembers t
+            | false => oddmembers t
+            end
+  end.
+
 
 Example test_oddmembers:
   oddmembers [0;1;0;2;3;0;0] = [1;3].
-  (* FILL IN HERE *) Admitted.
+Proof.
+  simpl. reflexivity.
+Qed.
 
-Definition countoddmembers (l:natlist) : nat
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Definition countoddmembers (l:natlist) : nat :=
+  (* This need [Fixpoint] *)
+  (* match l with *)
+  (* | [] => O *)
+  (* | h :: d => match oddb h with *)
+  (*           | true => S (countoddmembers d) *)
+  (*           | false => countoddmembers *)
+  (*           end *)
+  (* end. *)
+  length ( oddmembers l ).
 
 Example test_countoddmembers1:
   countoddmembers [1;0;3;1;4;5] = 4.
-  (* FILL IN HERE *) Admitted.
+Proof.
+  simpl. reflexivity.
+Qed.
 
 Example test_countoddmembers2:
   countoddmembers [0;2;4] = 0.
-  (* FILL IN HERE *) Admitted.
+Proof.
+  simpl. reflexivity.
+Qed.
 
 Example test_countoddmembers3:
   countoddmembers nil = 0.
-  (* FILL IN HERE *) Admitted.
+Proof.
+  simpl. reflexivity.
+Qed.
+
 (** [] *)
 
 (** **** Exercise: 3 stars, advanced (alternate) 
@@ -333,24 +380,44 @@ Example test_countoddmembers3:
     of both lists at the same time.  One possible solution involves
     defining a new kind of pairs, but this is not the only way.)  *)
 
-Fixpoint alternate (l1 l2 : natlist) : natlist
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Fixpoint alternate (l1 l2 : natlist) : natlist :=
+  (* This solution cannot guess decreasing argument of fix *)
+  (* match l1 with *)
+  (* | [] => l2 *)
+  (* | h :: m => h :: alternate l2 m *)
+  match l1, l2 with
+  | [] , [] => []
+  | [] , l2 =>  l2
+  | l1 , [] => l1
+  | h1::t1 , h2::t2 => h1::h2::(alternate t1 t2)
+  end.
+
 
 Example test_alternate1:
   alternate [1;2;3] [4;5;6] = [1;4;2;5;3;6].
-  (* FILL IN HERE *) Admitted.
+Proof.
+  reflexivity.
+Qed.
+
 
 Example test_alternate2:
   alternate [1] [4;5;6] = [1;4;5;6].
-  (* FILL IN HERE *) Admitted.
+Proof.
+  reflexivity.
+Qed.
 
 Example test_alternate3:
   alternate [1;2;3] [4] = [1;4;2;3].
-  (* FILL IN HERE *) Admitted.
+Proof.
+  reflexivity.
+Qed.
+
 
 Example test_alternate4:
   alternate [] [20;30] = [20;30].
-  (* FILL IN HERE *) Admitted.
+Proof.
+  reflexivity.
+Qed.
 (** [] *)
 
 (* ----------------------------------------------------------------- *)
