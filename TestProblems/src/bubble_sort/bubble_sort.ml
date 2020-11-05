@@ -13,7 +13,12 @@ let bubble_sort (compare:'a -> 'a -> int) (xs:'a list) : 'a list =
     (* Call `bubble` on the list `n` times, where `n` is the length of the
        list. *)
     if i > 0 then
-      aux (bubble xs) (i - 1)
+      let xs = bubble xs in
+      let _ = Printf.printf "Inside loop bubble with num= %d | " (i-1) in
+      let _ = List.iter (Printf.printf "%d ")  xs in
+      let _ = Printf.printf "\n" in
+      (* aux (bubble xs) (i - 1) *)
+      aux xs (i - 1)
     else
       xs
   in aux xs (List.length xs)

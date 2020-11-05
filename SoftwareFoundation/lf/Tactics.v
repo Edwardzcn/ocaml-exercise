@@ -75,7 +75,13 @@ Theorem silly_ex :
      evenb 2 = true ->
      oddb 3 = true.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros.
+  (* If we don't use apply tactic *)
+  (* rewrite -> H. reflexivity. *)
+  (* rewrite -> H0. reflexivity. *)
+  apply H.
+  apply H0.
+Qed.
 (** [] *)
 
 (** To use the [apply] tactic, the (conclusion of the) fact
