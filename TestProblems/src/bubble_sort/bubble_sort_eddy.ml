@@ -1,4 +1,4 @@
-let bubble_sort (compare: 'a-> 'a -> int) (xs: 'a list) : 'a list =
+let bubble_sort' (compare: 'a-> 'a -> int) (xs: 'a list) : 'a list =
   let len = List.length xs
   in
   (* Not tail recursive *)
@@ -25,4 +25,4 @@ let bubble_sort (compare: 'a-> 'a -> int) (xs: 'a list) : 'a list =
   aux xs  len;;
 
 
-bubble_sort compare [1;10;3;1;4;5;6;8;2;4;5;1;9];;
+bubble_sort' compare [1;10;3;1;4;5;6;8;2;4;5;1;9];;

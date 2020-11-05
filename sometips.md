@@ -18,6 +18,8 @@
 
 4. [VerKer - Verification of Linux Kernel Library Functions](https://forge.ispras.ru/projects/verker)
 
+5. [COS 326 Functional Programming | Princeton](https://www.cs.princeton.edu/courses/archive/fall20/cos326/schedule.php)
+
 ## Pioneers
 
 1. [Jason Hu | Zhihu](https://www.zhihu.com/people/jason-hu-42-79)
