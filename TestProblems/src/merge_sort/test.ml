@@ -1,4 +1,4 @@
-open Merge_sort
+open Merge_sort_eddy
 open OUnit2
 
 let () = run_test_tt_main ("merge_sort comp xs" >::: [

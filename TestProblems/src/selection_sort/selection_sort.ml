@@ -18,4 +18,6 @@ let selection_sort (compare:'a -> 'a -> int) (xs:'a list) : 'a list =
                  of the list. *)
               select (x::acc) min xs in
         select [] x xs in
-  aux xs
+  aux xs;;
+
+selection_sort compare [1;10;3;1;4;5;6;8;2;4;5;1;9];;

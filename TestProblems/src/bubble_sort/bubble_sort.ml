@@ -21,4 +21,6 @@ let bubble_sort (compare:'a -> 'a -> int) (xs:'a list) : 'a list =
       aux xs (i - 1)
     else
       xs
-  in aux xs (List.length xs)
+  in aux xs (List.length xs);;
+
+bubble_sort compare [1;10;3;1;4;5;6;8;2;4;5;1;9];;
