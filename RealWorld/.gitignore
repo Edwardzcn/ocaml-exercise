@@ -4,4 +4,6 @@
 /*/common/
 /*/*.gif
 /*/*.o
+/*/*.cmi
+/*/*.cmx
 /*/_build/
