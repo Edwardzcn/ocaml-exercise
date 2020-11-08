@@ -210,7 +210,11 @@ Example trans_eq_exercise : forall (n m o p : nat),
      (n + p) = m ->
      (n + p) = (minustwo o).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros.
+  transitivity m.
+  apply H0.
+  apply H.
+Qed.
 (** [] *)
 
 (* ################################################################# *)
@@ -309,7 +313,14 @@ Example injection_ex3 : forall (X : Type) (x y z : X) (l j : list X),
   j = z :: l ->
   x = y.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros.
+  (* Yes, you can write a graph yourself and you will find the head ele will be the same (x = z) and the rest of list, due to the constructor of the list  *)
+  injection H.
+  intros.
+  assert (H': z::l = y::l). { rewrite H1. symmetry. apply H0.  }
+  - injection H' as Hinj.
+    rewrite H2. apply Hinj.
+Qed.
 (** [] *)
 
 (** So much for injectivity of constructors.  What about disjointness?
@@ -383,7 +394,9 @@ Example discriminate_ex3 :
     x :: y :: l = [] ->
     x = z.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros.
+  discriminate H.
+Qed.
 (** [] *)
 
 (** The injectivity of constructors allows us to reason that
@@ -571,7 +584,6 @@ Proof.
   - (* n = O *) simpl. intros m eq. destruct m as [| m'] eqn:E.
     + (* m = O *) reflexivity.
     + (* m = S m' *) discriminate eq.
-
   - (* n = S n' *) simpl.
 
 (** Notice that both the goal and the induction hypothesis are
