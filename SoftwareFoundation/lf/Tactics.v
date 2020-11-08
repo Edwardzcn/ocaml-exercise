@@ -604,7 +604,8 @@ Proof.
 (** The 0 case is trivial: *)
 
     discriminate eq.
-    + (* m = S m' *)
+    +
+      (* m = S m' *)
       apply f_equal.
 
 (** At this point, since we are in the second branch of the [destruct
@@ -629,7 +630,19 @@ Proof.
 Theorem eqb_true : forall n m,
     n =? m = true -> n = m.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n.
+  induction  n  as [| n' IHn'].
+  - intros. destruct m as [| m'].
+    + reflexivity.
+    + simpl in H. discriminate H.
+  - intros. destruct m as [| m'].
+    + simpl in H. discriminate H.
+    + simpl in H.
+      (* We apply IHn' in H. Forward reasonning. *)
+      apply IHn' in H.
+      rewrite H.
+      reflexivity.
+Qed.
 (** [] *)
 
 (** **** Exercise: 2 stars, advanced (eqb_true_informal) 
@@ -638,6 +651,8 @@ Proof.
     as possible about quantifiers. *)
 
 (* FILL IN HERE *)
+
+(* Sorry, I cannot *)
 
 (* Do not modify the following line: *)
 Definition manual_grade_for_informal_proof : option (nat*string) := None.
@@ -651,7 +666,31 @@ Theorem plus_n_n_injective : forall n m,
      n + n = m + m ->
      n = m.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* Hint: use [plus_n_Sm] *)
+  intros n.
+  induction n as [| n' IHn'].
+  - intros. destruct m as [| m'].
+    + reflexivity.
+    + simpl in H. discriminate H.
+  - destruct  m as [| m'].
+    + intros. discriminate H.
+    + intros. simpl in H.
+      Check plus_n_Sm.
+      Search (S ( _ + _ ) ).
+      rewrite <- plus_n_Sm in H.
+      rewrite <- plus_n_Sm in H.
+      (* Use injection property *)
+      injection H as IHinj.
+      (* Now we can apply IHn' in IHinj with specific m ( that is m') *)
+      apply IHn' in IHinj.
+      Search ( ?a = ?b -> S ?a = S ?b).
+      (* As a backward reasoning, we could rewrite the goal with IHinj and  *)
+      rewrite IHinj.
+      reflexivity.
+      (* As a forward reasoning, I search the existing therom and make S n' = S m' *)
+      (* apply eq_S in IHinj. *)
+      (* apply IHinj. *)
+Qed.
 (** [] *)
 
 (** The strategy of doing fewer [intros] before an [induction] to
@@ -758,7 +797,17 @@ Theorem nth_error_after_last: forall (n : nat) (X : Type) (l : list X),
      length l = n ->
      nth_error l n = None.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* Prove by induction on [l] *)
+  intros n X l.
+  generalize dependent n.
+  generalize dependent X.
+  induction l as [| hd' l' IHl'].
+  - simpl. reflexivity.
+  - destruct n.
+    + simpl. intros. discriminate H.
+    + simpl. intros. injection H as IHinj.
+      apply IHl' in IHinj. apply IHinj.
+Qed.
 (** [] *)
 
 (* ################################################################# *)
