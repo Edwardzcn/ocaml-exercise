@@ -98,6 +98,7 @@ Proof.
 (** Here we cannot use [apply] directly, but we can use the [symmetry]
     tactic, which switches the left and right sides of an equality in
     the goal. *)
+  
 
   symmetry.
   simpl. (** (This [simpl] is optional, since [apply] will perform
@@ -117,7 +118,13 @@ Theorem rev_exercise1 : forall (l l' : list nat),
      l = rev l' ->
      l' = rev l.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros l l' H.
+  (* we need to use symmetry *)
+  symmetry.
+  Search (  rev (rev _ )).
+  rewrite H.
+  apply rev_involutive.
+Qed.
 (** [] *)
 
 (** **** Exercise: 1 star, standard, optional (apply_rewrite) 
@@ -126,7 +133,11 @@ Proof.
     [rewrite].  What are the situations where both can usefully be
     applied? *)
 
+
 (* FILL IN HERE
+
+   - [rewrtie] only rewrtie the same pattern
+   - [apply] means apply the former lemma/H or something else. So Coq will help us check if the situation satisfies (include the equ).
 
     [] *)
 
