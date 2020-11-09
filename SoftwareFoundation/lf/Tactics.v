@@ -963,6 +963,7 @@ Proof.
     [n] is equal to [3] or it isn't, so we can use [destruct (eqb
     n 3)] to let us reason about the two cases.
 
+
     In general, the [destruct] tactic can be used to perform case
     analysis of the results of arbitrary computations.  If [e] is an
     expression whose type is some inductively defined type [T], then,
@@ -992,7 +993,22 @@ Theorem combine_split : forall X Y (l : list (X * Y)) l1 l2,
   split l = (l1, l2) ->
   combine l1 l2 = l.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros X Y.
+  induction l.
+  - simpl.
+    intros l1 l2 H.
+    Search ( (_,_) = (_,_)  ).
+    injection H as h1 h2. rewrite <- h1. rewrite <- h2.
+    reflexivity.
+  - intros l1 l2 H.
+    destruct x as [a b].
+    Print split.
+    simpl in H.
+    destruct (split l) as [lx ly] eqn:Et in H.
+    injection H as h1 h2. rewrite <- h1. rewrite <- h2.
+    simpl.
+    apply IHl in Et. rewrite Et. reflexivity.
+Qed.
 (** [] *)
 
 (** The [eqn:] part of the [destruct] tactic is optional: So far,
