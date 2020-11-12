@@ -1043,7 +1043,8 @@ Abort.
 
 (** ... then we are stuck at this point because the context does
     not contain enough information to prove the goal!  The problem is
-    that the substitution performed by [destruct] is quite brutal --
+
+  that the substitution performed by [destruct] is quite brutal --
     in this case, it throws away every occurrence of [n =? 3], but we
     need to keep some memory of this expression and how it was
     destructed, because we need to be able to reason that, since [n =?
@@ -1083,7 +1084,19 @@ Theorem bool_fn_applied_thrice :
   forall (f : bool -> bool) (b : bool),
   f (f (f b)) = f b.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros f b.
+  destruct (b) eqn:Heq1.
+  - destruct (f true) eqn:Heq2.
+    + rewrite Heq2. rewrite Heq2. reflexivity.
+    + destruct (f false) eqn:Heq3.
+      * apply Heq2.
+      * apply Heq3.
+  - destruct (f false) eqn:Heq2.
+    + destruct (f true) eqn:Heq3.
+      * apply Heq3.
+      * apply Heq2.
+    + rewrite Heq2. apply Heq2.
+Qed.
 (** [] *)
 
 (* ################################################################# *)
@@ -1164,7 +1177,20 @@ Proof.
 Theorem eqb_sym : forall (n m : nat),
   (n =? m) = (m =? n).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n m.
+  generalize dependent m.
+  Search (_ =? _).
+  Print eqb.
+  induction n as [| n' IHn'].
+  - intros m.
+    destruct m.
+    + simpl. reflexivity.
+    + simpl. reflexivity.
+  - intros m.
+    destruct m.
+    + simpl. reflexivity.
+    + simpl. apply IHn'.
+Qed.
 (** [] *)
 
 (** **** Exercise: 3 stars, advanced, optional (eqb_sym_informal) 
@@ -1185,7 +1211,14 @@ Theorem eqb_trans : forall n m p,
   m =? p = true ->
   n =? p = true.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros.
+  Search (_ =? _ = true).
+  apply eqb_true in H.
+  apply eqb_true in H0.
+  rewrite <- H0. rewrite <- H.
+  symmetry.
+  apply eqb_refl.
+Qed.
 (** [] *)
 
 (** **** Exercise: 3 stars, advanced (split_combine) 
@@ -1202,15 +1235,23 @@ Proof.
     things than necessary.  Hint: what property do you need of [l1]
     and [l2] for [split (combine l1 l2) = (l1,l2)] to be true?) *)
 
-Definition split_combine_statement : Prop
+Definition split_combine_statement : Prop :=
   (* ("[: Prop]" means that we are giving a name to a
      logical proposition here.) *)
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+  (* forall X Y (l1 : list X) (l2 : list Y), *)
+(*   length l1 = length l2 -> split (combine l1 l2) = (l1, l2). *)
+  forall X Y (l : list (X * Y)) l1 l2,
+    combine l1 l2 = l -> split l = (l1, l2).
 
 Theorem split_combine : split_combine_statement.
 Proof.
-(* FILL IN HERE *) Admitted.
+  unfold split_combine_statement.
+  intros X Y l.
+  induction l.
+  - intros l1 l2 H. simpl. destruct (combine l1 l2) eqn:Heq in H.
+    + 
 
+ 
 (* Do not modify the following line: *)
 Definition manual_grade_for_split_combine : option (nat*string) := None.
 (** [] *)
