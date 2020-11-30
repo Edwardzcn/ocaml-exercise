@@ -94,7 +94,7 @@ Qed.
     polymorphic: *)
 
 Check @eq : forall A : Type, A -> A -> Prop.
-
+ 
 (** (Notice that we wrote [@eq] instead of [eq]: The type
     argument [A] to [eq] is declared as implicit, and we need to turn
     off the inference of this implicit argument to see the full type
@@ -111,6 +111,14 @@ Check @eq : forall A : Type, A -> A -> Prop.
     are true. *)
 
 Example and_example : 3 + 4 = 7 /\ 2 * 2 = 4.
+
+Check @eq.
+
+Check @eqb.
+
+Check @or.
+
+Check @and.
 
 (** To prove a conjunction, use the [split] tactic.  It will generate
     two subgoals, one for each part of the statement: *)
@@ -139,7 +147,7 @@ Qed.
 
 Example and_example' : 3 + 4 = 7 /\ 2 * 2 = 4.
 Proof.
-  apply and_intro.
+  apply and_intro.              (* or we can use split *)
   - (* 3 + 4 = 7 *) reflexivity.
   - (* 2 + 2 = 4 *) reflexivity.
 Qed.
@@ -148,7 +156,15 @@ Qed.
 Example and_exercise :
   forall n m : nat, n + m = 0 -> n = 0 /\ m = 0.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n.
+  destruct n as [| n'].
+  - simpl.
+    split.
+    + reflexivity.
+    + apply H.
+  - intros.
+    discriminate.
+Qed.
 (** [] *)
 
 (** So much for proving conjunctive statements.  To go in the other
@@ -226,7 +242,10 @@ Proof.
 Lemma proj2 : forall P Q : Prop,
   P /\ Q -> Q.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros P Q H.
+  destruct H.
+  apply H0.
+Qed.
 (** [] *)
 
 (** Finally, we sometimes need to rearrange the order of conjunctions
@@ -253,7 +272,12 @@ Theorem and_assoc : forall P Q R : Prop,
   P /\ (Q /\ R) -> (P /\ Q) /\ R.
 Proof.
   intros P Q R [HP [HQ HR]].
-  (* FILL IN HERE *) Admitted.
+  split.
+  - split.
+    + apply HP.
+    + apply HQ.
+  - apply HR.
+Qed.
 (** [] *)
 
 (** By the way, the infix notation [/\] is actually just syntactic
@@ -308,7 +332,7 @@ Lemma zero_or_succ :
   forall n : nat, n = 0 \/ n = S (pred n).
 Proof.
   (* WORKED IN CLASS *)
-  intros [|n'].
+  intros [| n'].
   - left. reflexivity.
   - right. reflexivity.
 Qed.
@@ -317,7 +341,13 @@ Qed.
 Lemma mult_eq_0 :
   forall n m, n * m = 0 -> n = 0 \/ m = 0.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros [| n'].
+  - simpl. left. reflexivity.
+  - intros. simpl in H.
+    destruct m as [| m'].
+    + right. reflexivity.
+    + discriminate.
+Qed.
 (** [] *)
 
 (** **** Exercise: 1 star, standard (or_commut)  *)
