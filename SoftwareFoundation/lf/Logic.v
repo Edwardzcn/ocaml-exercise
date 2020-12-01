@@ -829,6 +829,20 @@ Fixpoint In {A : Type} (x : A) (l : list A) : Prop :=
 (** When [In] is applied to a concrete list, it expands into a
     concrete sequence of nested disjunctions. *)
 
+(* My Example *)
+Example In_example_0 :
+  forall n, In n [] ->
+  exists n', n = 2 * n'.
+Proof.
+  simpl.
+  (* we can finish this proof by . *)
+  (* intros n []. *)
+  intros.
+  destruct H.
+  (* intros n [] is a short cut of intros n. destruct [False] *)
+Qed.
+
+
 Example In_example_1 : In 4 [1; 2; 3; 4; 5].
 Proof.
   (* WORKED IN CLASS *)
@@ -859,7 +873,7 @@ Theorem In_map :
     In (f x) (map f l).
 Proof.
   intros A B f l x.
-  induction l as [|x' l' IHl'].
+  induction l as [| x' l' IHl'].
   - (* l = nil, contradiction *)
     simpl. intros [].
   - (* l = x' :: l' *)
@@ -882,8 +896,19 @@ Theorem In_map_iff :
     In y (map f l) <->
     exists x, f x = y /\ In x l.
 Proof.
+  (* My version *)
   intros A B f l y. split.
-  (* FILL IN HERE *) Admitted.
+  - (* ---> *) induction l.
+    + simpl. intros [].
+    + simpl. intros [H | H].
+      * exists x. split. apply H. left. reflexivity.
+      * apply IHl in H. destruct H as [ x0 [H1 H2]]. exists x0. auto.
+  - (* <--- *) induction l.
+    + simpl. intros [ x [H1 []]].
+    + simpl. intros [ x0 [H1 [H2 | H3]]].
+      * left. rewrite <- H2 in H1. apply H1.
+      * right. apply IHl. exists x0. split. apply H1. apply H3.
+Qed.
 (** [] *)
 
 (** **** Exercise: 2 stars, standard (In_app_iff)  *)
@@ -891,7 +916,30 @@ Theorem In_app_iff : forall A l l' (a:A),
   In a (l++l') <-> In a l \/ In a l'.
 Proof.
   intros A l. induction l as [|a' l' IH].
-  (* FILL IN HERE *) Admitted.
+  - (* l = [] *) simpl.
+    intros l' a.
+    split.
+    + (* ---> *) intros. right. assumption.
+    + (* <--- *) intros [ [] | H]. assumption.
+  - (* l = hd :: tl *) simpl.
+    split.                      (* l'0 and a are general *)
+    + (* ---> *) intros [H1 | H2]. 
+      * left. left. apply H1.
+      * apply IH in H2. destruct H2 as [H2 | H2].
+        { left. right. apply H2. }
+        { right. apply H2. }
+    + (* <--- *) intros. destruct H as [[H | H ] | H ].
+      * left. apply H.
+      * Search ( _ -> _ \/ _).
+        assert (In a l' \/ In a l'0).
+        { left. apply H. }
+        apply IH in H0.
+        right. assumption.
+      * assert (In a l' \/ In a l'0).
+        { right. apply H. }
+        apply IH in H0.
+        right. assumption.
+Qed.
 (** [] *)
 
 (** **** Exercise: 3 stars, standard, especially useful (All) 
@@ -906,16 +954,38 @@ Proof.
     lemma below.  (Of course, your definition should _not_ just
     restate the left-hand side of [All_In].) *)
 
-Fixpoint All {T : Type} (P : T -> Prop) (l : list T) : Prop
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Fixpoint All {T : Type} (P : T -> Prop) (l : list T) : Prop :=
+  match l with
+  | [] => True
+  | hd :: tl => (* if P hd then All P tl else False *)
+    P hd /\ All P tl
+  end.
+
+
 
 Theorem All_In :
   forall T (P : T -> Prop) (l : list T),
     (forall x, In x l -> P x) <->
     All P l.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros T P l.
+  split.
+  - (* ---> *) induction l as [| hd tl IHl].
+    + simpl. reflexivity.
+    + simpl. split.
+      * apply H. left. reflexivity.
+      * apply IHl. intros. apply H. right. apply H0.
+  - (* <--- *)
+    intros.
+    induction l as [| hd hl IHl].
+    + simpl. simpl in H0. destruct H0.
+    + simpl. simpl in H0. destruct H as [H1' H2']. destruct H0.
+      * rewrite <- H. assumption.
+      * apply IHl. apply H2'. apply H.
+Qed.
 (** [] *)
+
+(* TODO *)
 
 (** **** Exercise: 2 stars, standard, optional (combine_odd_even) 
 
@@ -974,6 +1044,10 @@ Proof.
     particular identifier refers to. *)
 
 Check plus_comm : forall n m : nat, n + m = m + n.
+Check plus_comm.
+
+Check 2 : nat.
+Check 2.
 
 (** Coq checks the _statement_ of the [plus_comm] theorem (or prints
     it for us, if we leave off the part beginning with the colon) in
@@ -1125,9 +1199,14 @@ Example lemma_application_ex :
     n = 0.
 Proof.
   intros n ns H.
+  (* My notes begin*)
+  Check proj1.
+  Check In_map_iff.
+  (* My notes end *)
   destruct (proj1 _ _ (In_map_iff _ _ _ _ _) H)
            as [m [Hm _]].
   rewrite mult_0_r in Hm. rewrite <- Hm. reflexivity.
+  (* Can't understand *)
 Qed.
 
 (** We will see many more examples in later chapters. *)
