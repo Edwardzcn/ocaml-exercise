@@ -354,7 +354,10 @@ Qed.
 Theorem or_commut : forall P Q : Prop,
   P \/ Q  -> Q \/ P.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros P Q [HP | HQ].
+  - right. apply HP.
+  - left. apply HQ.
+Qed.
 (** [] *)
 
 (* ================================================================= *)
@@ -410,7 +413,12 @@ Proof.
 Fact not_implies_our_not : forall (P:Prop),
   ~ P -> (forall (Q:Prop), P -> Q).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros P H1.
+  unfold not in H1.
+  intros Q H2.
+  apply H1 in H2.
+  destruct H2.
+Qed.
 (** [] *)
 
 (** Inequality is a frequent enough example of negated statement
@@ -421,6 +429,8 @@ Proof.
 
 (** We can use [not] to state that [0] and [1] are different elements
     of [nat]: *)
+
+
 
 Theorem zero_not_one : 0 <> 1.
 Proof.
@@ -479,14 +489,26 @@ Definition manual_grade_for_double_neg_inf : option (nat*string) := None.
 Theorem contrapositive : forall (P Q : Prop),
   (P -> Q) -> (~Q -> ~P).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros P Q H1 H2.
+  unfold not in H2. unfold not.
+
+  intros H3.
+  apply H1 in H3.
+  apply H2 in H3.
+  assumption.
+Qed.
 (** [] *)
 
 (** **** Exercise: 1 star, standard (not_both_true_and_false)  *)
 Theorem not_both_true_and_false : forall P : Prop,
   ~ (P /\ ~P).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros P.
+  intros H.
+  destruct H as [H1 H2].
+  apply H2 in H1.
+  assumption.
+Qed.
 (** [] *)
 
 (** **** Exercise: 1 star, advanced (informal_not_PNP) 
@@ -598,19 +620,38 @@ Qed.
 Theorem iff_refl : forall P : Prop,
   P <-> P.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros P. split.
+  - intros. assumption.
+  - intros. assumption.
+Qed.
 
 Theorem iff_trans : forall P Q R : Prop,
   (P <-> Q) -> (Q <-> R) -> (P <-> R).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros P Q R.
+  intros [H1 H2] [H3 H4].
+  split.
+  - intros. apply H1 in H. apply H3 in H. assumption.
+  - intros. apply H4 in H. apply H2 in H. assumption.
+Qed.
+
 (** [] *)
 
 (** **** Exercise: 3 stars, standard (or_distributes_over_and)  *)
 Theorem or_distributes_over_and : forall P Q R : Prop,
   P \/ (Q /\ R) <-> (P \/ Q) /\ (P \/ R).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros.
+  split.
+  - intros [HP | [HQ HR] ].
+    + split. left. apply HP. left. apply HP.
+    + split. right. assumption. right. assumption.
+  - intros [ [HP | HQ] [HP' | HR] ].
+    + left. assumption.
+    + left. assumption.
+    + left. assumption.
+    + right. split. assumption. assumption.
+Qed.
 (** [] *)
 
 (* ================================================================= *)
@@ -727,11 +768,19 @@ Proof.
     which [P] does not hold."  (Hint: [destruct H as [x E]] works on
     existential assumptions!)  *)
 
+
 Theorem dist_not_exists : forall (X:Type) (P : X -> Prop),
   (forall x, P x) -> ~ (exists x, ~ P x).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros X P H1.
+  unfold not.
+  intros [x H2].
+  apply H2.
+  apply H1.
+Qed.
 (** [] *)
+
+
 
 (** **** Exercise: 2 stars, standard (dist_exists_or) 
 
@@ -741,7 +790,15 @@ Proof.
 Theorem dist_exists_or : forall (X:Type) (P Q : X -> Prop),
   (exists x, P x \/ Q x) <-> (exists x, P x) \/ (exists x, Q x).
 Proof.
-   (* FILL IN HERE *) Admitted.
+  intros X P Q.
+  split.
+  - intros [x [Hx | Qx]].
+    + left. exists x. apply Hx.
+    + right. exists x. apply Qx.
+  - intros [ [ x Hx ] | [x Qx] ].
+    + exists x. left. assumption.
+    + exists x. right. assumption.
+Qed.
 (** [] *)
 
 (* ################################################################# *)
