@@ -1325,6 +1325,17 @@ Print Assumptions function_equality_ex2.
     of the list, which means that [rev] is asymptotically quadratic.
     We can improve this with the following definitions: *)
 
+Print rev.
+
+(* ===>
+rev =
+fix rev (X : Type) (l : list X) {struct l} : list X :=
+  match l with
+  | [ ] => [ ]
+  | h :: t => rev X t ++ [h]
+  end
+     : forall X : Type, list X -> list X *)
+
 Fixpoint rev_append {X} (l1 l2 : list X) : list X :=
   match l1 with
   | [] => l2
@@ -1342,9 +1353,39 @@ Definition tr_rev {X} (l : list X) : list X :=
 
     Prove that the two definitions are indeed equivalent. *)
 
+
+(* My Lemma *)
+Lemma rev_append_app : forall {X : Type} (l1 : list X) (l2 : list X) ,
+    rev_append l1 l2 = rev_append l1 [ ] ++ l2.
+Proof.
+  intros.
+  generalize dependent l2.
+  induction l1 as [| x' l1' IHl].
+  - simpl. reflexivity.
+  - intros. simpl.
+    rewrite IHl with (l2 := x' :: l2).
+    rewrite IHl with (l2 := [x']).
+    rewrite <- app_assoc. simpl.
+    reflexivity.
+Qed.
+
 Theorem tr_rev_correct : forall X, @tr_rev X = @rev X.
 Proof.
-(* FILL IN HERE *) Admitted.
+  intros X. Search "function".
+  apply functional_extensionality.
+  induction x as [| hd tl IHl].
+  - (* x = [] *)
+    simpl.
+    unfold tr_rev. simpl. reflexivity.
+  - (* x = hd::tl *)
+    unfold tr_rev.
+    simpl.
+    unfold tr_rev in IHl.
+    rewrite <- IHl.
+    Search (rev_append).
+    rewrite rev_append_app.
+    reflexivity.
+Qed.
 (** [] *)
 
 (* ================================================================= *)
