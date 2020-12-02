@@ -1423,7 +1423,33 @@ Lemma evenb_double_conv : forall n, exists k,
   n = if evenb n then double k else S (double k).
 Proof.
   (* Hint: Use the [evenb_S] lemma from [Induction.v]. *)
-  (* FILL IN HERE *) Admitted.
+  Check evenb_S.
+  intros.
+  induction n as [| n' IHn].
+  - (* n = 0 *)
+    exists 0.
+    reflexivity.
+  - (* n = S n' *)
+    destruct (evenb n') eqn:He.
+    + (* evenb n = true *)
+      Check evenb_S.
+      assert (evenb (S n') = false) . 
+      { rewrite evenb_S. rewrite He. reflexivity.  }
+      rewrite H.
+      destruct IHn.
+      exists x.
+      rewrite H0.
+      reflexivity.
+    + (* evenb n = false *)
+      assert (evenb (S n') = true).
+      { rewrite evenb_S. rewrite He. reflexivity. }
+      rewrite H.
+      destruct IHn as [k'].
+      exists (S(k')).
+      rewrite H0.
+      simpl.
+      reflexivity.
+Qed.
 (** [] *)
 
 (** Now the main theorem: *)
@@ -1433,7 +1459,7 @@ Proof.
   intros n. split.
   - intros H. destruct (evenb_double_conv n) as [k Hk].
     rewrite Hk. rewrite H. exists k. reflexivity.
-  - intros [k Hk]. rewrite Hk. apply evenb_double.
+  - unfold even. intros [k Hk]. rewrite Hk. apply evenb_double.
 Qed.
 
 (** In view of this theorem, we say that the boolean computation
