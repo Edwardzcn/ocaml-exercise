@@ -473,6 +473,11 @@ Proof.
   (* WORKED IN CLASS *)
   intros P H. unfold not. intros G. apply G. apply H.  Qed.
 
+(* Theorem double_neg_rev : forall P : Prop, *)
+(*     ~~P -> P. *)
+(* Proof. *)
+(*   intros. unfold not in H.  *)
+
 (** **** Exercise: 2 stars, advanced (double_neg_inf) 
 
     Write an informal proof of [double_neg]:
@@ -1593,7 +1598,8 @@ Lemma plus_eqb_example : forall n m p : nat,
 Proof.
   (* WORKED IN CLASS *)
   intros n m p H.
-    rewrite eqb_eq in H.
+  rewrite eqb_eq in H.
+  Check eqb_eq.
   rewrite H.
   rewrite eqb_eq.
   reflexivity.
@@ -1613,12 +1619,47 @@ Qed.
 Theorem andb_true_iff : forall b1 b2:bool,
   b1 && b2 = true <-> b1 = true /\ b2 = true.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros b1 b2.
+  split.
+  - (* ---> *) intros H.
+    Search (_ && _).
+    split.
+    + rewrite andb_commutative in H.
+      apply andb_true_elim2 in H.
+      assumption.
+    + apply andb_true_elim2 in H.
+      assumption.
+  - (* <--- *) intros H.
+    destruct H as [H1 H2].
+    rewrite  H1. rewrite H2.
+    reflexivity.
+Qed.
+
+(* My Leamma *)
+Search "comm".
+Theorem orb_commutative : forall b1 b2,
+    b1 || b2 = b2 || b1.
+Proof.
+  intros [] [].
+  - reflexivity.
+  - reflexivity.
+  - reflexivity.
+  - reflexivity.
+Qed.
 
 Theorem orb_true_iff : forall b1 b2,
   b1 || b2 = true <-> b1 = true \/ b2 = true.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros b1 b2.
+  split.
+  - (* ---> *) intros H.
+    destruct b1 eqn: Heq.
+    + left. reflexivity.
+    + right. simpl in H. assumption.
+  - (* <--- *) intros [H | H].
+    + rewrite H. simpl. reflexivity.
+    + rewrite H. rewrite orb_commutative. simpl. reflexivity.
+Qed.
 (** [] *)
 
 (** **** Exercise: 1 star, standard (eqb_neq) 
@@ -1630,10 +1671,31 @@ Proof.
 Theorem eqb_neq : forall x y : nat,
   x =? y = false <-> x <> y.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  Locate eqb_eq.
+  intros x y.
+  split.
+  - intros.
+    Check not_true_iff_false.
+    unfold not.
+    intros.
+    rewrite H0 in H.
+    Search (?a =? ?a).
+    rewrite <- eqb_refl in H.
+    discriminate.
+  - intros.
+    destruct (x =? y) eqn:Heq.
+    +
+      (* destruct may help exfalso the goal and unfold and apply H  *)
+      (* unfold not in H. *)
+      (* exfalso. *)
+      (* apply H. *)
+      destruct H.
+      apply eqb_eq in Heq. assumption.
+    + reflexivity.
+Qed.
 (** [] *)
 
-(** **** Exercise: 3 stars, standard (eqb_list) 
+(** **** Exercise: 3 stars, standard (eqb_list)
 
     Given a boolean operator [eqb] for testing equality of elements of
     some type [A], we can define a function [eqb_list] for testing
@@ -1642,22 +1704,84 @@ Proof.
     definition is correct, prove the lemma [eqb_list_true_iff]. *)
 
 Fixpoint eqb_list {A : Type} (eqb : A -> A -> bool)
-                  (l1 l2 : list A) : bool
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+         (l1 l2 : list A) : bool:=
+  match l1, l2  with
+  | [], [] => true
+  | [], _  => false
+  | _ , [] => false
+  | h1::t1 , h2 :: t2 => if eqb h1 h2 then eqb_list eqb t1 t2
+                      else false
+  end.
 
 Theorem eqb_list_true_iff :
   forall A (eqb : A -> A -> bool),
     (forall a1 a2, eqb a1 a2 = true <-> a1 = a2) ->
     forall l1 l2, eqb_list eqb l1 l2 = true <-> l1 = l2.
 Proof.
-(* FILL IN HERE *) Admitted.
-
+  intros A feqb.
+  intros H.
+  intros l1.
+  induction l1 as [| hd1 tl1 IHl1].
+  - (* l1 = [] : induction *)
+    intros l2. destruct l2 as [ | hd2 tl2].
+    + (* l2 = [] : destruct *)
+      split.
+      * (* ---> *)
+        simpl. reflexivity.
+      * (* <--- *)
+        simpl. reflexivity.
+    + (* l2 = hd2 :: tl2 : destruct *)
+      split.
+      * (* ---> *)
+        simpl. discriminate.
+      * (* <--- *)
+        simpl. discriminate.
+  - (* l1 = hd1 :: tl1 : induction *)
+    intros l2. destruct l2 as [ | hd2 tl2].
+    + (* l2 = [] : destruct *)
+      split.
+      * (* ---> *)
+        simpl. discriminate.
+      * (* <--- *)
+        simpl. discriminate.
+    + (* l2 = hd2 :: tl2 : induction , hard *)
+      split.
+      * (* ---> *)
+        simpl.
+        destruct (feqb hd1 hd2) eqn: Heq.
+        -- intros.
+           apply H in Heq.
+           apply IHl1 in H0.
+           rewrite Heq. rewrite H0. reflexivity.
+        -- intros.
+           discriminate.
+      * (* <--- *)
+        simpl.
+        destruct (feqb hd1 hd2) eqn: Heq.
+        -- intros.
+           apply H in Heq.
+           rewrite Heq in H0.
+           injection  H0 as H1.
+           apply IHl1 in H1.
+           apply H1.
+        -- intros.
+           injection H0 as H1.
+           apply H in H1.
+           rewrite Heq in H1.
+           apply H1.
+Qed.
 (** [] *)
 
 (** **** Exercise: 2 stars, standard, especially useful (All_forallb) 
 
     Recall the function [forallb], from the exercise
     [forall_exists_challenge] in chapter [Tactics]: *)
+
+Print forallb.
+Print andb.
+
+
+(* Right, if we unfold andb, we will find the definitions are equal *)
 
 Fixpoint forallb {X : Type} (test : X -> bool) (l : list X) : bool :=
   match l with
@@ -1671,8 +1795,37 @@ Fixpoint forallb {X : Type} (test : X -> bool) (l : list X) : bool :=
 Theorem forallb_true_iff : forall X test (l : list X),
    forallb test l = true <-> All (fun x => test x = true) l.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros X ftest l.
+  induction l as [ | hd tl IHl].
+  - split.
+    + simpl. reflexivity.
+    + simpl. reflexivity.
+  - split.
+    + simpl. intro Handb. Search ( _ && _ = true <-> _).
+      apply andb_true_iff in Handb.
+      destruct Handb as [H1 H2].
+      split.
+      * apply H1.
+      * apply IHl. apply H2.
+    + Print All.
+      (* Fixpoint All {T : Type} (P : T -> Prop) (l : list T) : Prop := *)
+      (*   match l with *)
+      (*   | [] => True *)
+      (*   | hd :: tl => (* if P hd then All P tl else False *) *)
+      (*     P hd /\ All P tl *)
+      (*   end. *)
 
+
+
+      (* Theorem All_In : *)
+      (*   forall T (P : T -> Prop) (l : list T), *)
+      (*     (forall x, In x l -> P x) <-> *)
+      (*     All P l. *)
+      simpl. intros [H1 H2].
+      apply IHl in H2.
+      unfold andb.
+      rewrite H1. apply H2.
+Qed.
 (** (Ungraded thought question) Are there any important properties of
     the function [forallb] which are not captured by this
     specification? *)
@@ -1813,11 +1966,19 @@ Qed.
     (Hint: you will need to come up with a clever assertion as the
     next step in the proof.) *)
 
+Check @double_neg.
+
 Theorem excluded_middle_irrefutable: forall (P:Prop),
   ~ ~ (P \/ ~ P).
 Proof.
   unfold not. intros P H.
-  (* FILL IN HERE *) Admitted.
+  apply H.
+  right.
+  intros H0.
+  apply H.
+  left.
+  apply H0.
+Qed.
 (** [] *)
 
 (** **** Exercise: 3 stars, advanced (not_exists_dist) 
@@ -1838,7 +1999,22 @@ Theorem not_exists_dist :
   forall (X:Type) (P : X -> Prop),
     ~ (exists x, ~ P x) -> (forall x, P x).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros Hex.
+  unfold excluded_middle in Hex.
+  intros X P.
+  unfold not.
+  intros H x.
+  assert ( ( P x ) \/ ~( P x)).
+  { apply Hex with (P:= P x). }
+  destruct H0 as [H0 | H0].
+  - apply H0.
+  - apply False_ind.
+    apply H.
+    Print False_ind.
+    unfold not in H0.
+    exists x.
+    apply H0.
+Qed.
 (** [] *)
 
 (** **** Exercise: 5 stars, standard, optional (classical_axioms) 
