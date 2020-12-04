@@ -135,10 +135,16 @@ Qed.
 
 Lemma and_intro : forall A B : Prop, A -> B -> A /\ B.
 Proof.
+  (* TODO: why *)
+  (* exact (fun (A B:Prop) (H:A) (H1:B) => conj H H1). *)
   intros A B HA HB. split.
   - apply HA.
   - apply HB.
+
+  Show Proof.
 Qed.
+
+  
 
 (** Since applying a theorem with hypotheses to some goal has the
     effect of generating as many subgoals as there are hypotheses for
@@ -2034,7 +2040,7 @@ Qed.
     all. *)
 
 Definition peirce := forall P Q: Prop,
-  ((P->Q)->P)->P.
+    ((P->Q)->P)->P.
 
 Definition double_negation_elimination := forall P:Prop,
   ~~P -> P.
@@ -2044,6 +2050,28 @@ Definition de_morgan_not_and_not := forall P Q:Prop,
 
 Definition implies_to_or := forall P Q:Prop,
   (P->Q) -> (~P\/Q).
+
+Theorem excluded_middle_iff_peirce :
+  excluded_middle <-> peirce.
+Proof.
+  unfold excluded_middle.
+  unfold peirce.
+  split.
+  - (* ---> *)
+    intros Hem.
+    intros P Q H.
+    destruct Hem with P as [H0 | H0].
+    + apply H0.
+    + apply H. intros HP. destruct H0. apply HP.
+  - (* <--- *)
+    intros Hpe.
+    intros P.
+    apply (Hpe (P \/ ~ P) False).
+    intros H1.
+    Check excluded_middle_irrefutable.
+    apply excluded_middle_irrefutable in H1.
+    destruct H1.
+Qed.
 
 (* FILL IN HERE
 
