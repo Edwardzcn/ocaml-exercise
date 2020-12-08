@@ -21,6 +21,9 @@ From Coq Require Export Lia.
     propositions toward the end of this chapter and in future
     chapters. *)
 
+Print double.
+Print evenb.
+
 (** In past chapters, we have seen two ways of stating that a number
     [n] is even: We can say
 
@@ -53,7 +56,9 @@ From Coq Require Export Lia.
                                  ev n
                             ----------------          (ev_SS)
                              ev (S (S n))
-*)
+ *)
+
+
 
 (** Each of the textual rules that we started with is
     reformatted here as an inference rule; the intended reading is
@@ -90,6 +95,8 @@ From Coq Require Export Lia.
 Inductive ev : nat -> Prop :=
 | ev_0 : ev 0
 | ev_SS (n : nat) (H : ev n) : ev (S (S n)).
+
+Check (ev_SS 0 ev_0).
 
 (** This definition is interestingly different from previous uses of
     [Inductive].  For one thing, we are defining not a [Type] (like
@@ -144,6 +151,14 @@ Proof. apply ev_SS. apply ev_SS. apply ev_0. Qed.
 Theorem ev_4' : ev 4.
 Proof. apply (ev_SS 2 (ev_SS 0 ev_0)). Qed.
 
+Theorem ev_4_my : ev 4.
+Proof.
+  Check (ev 2) : Prop.
+  assert (ev 2).
+  apply (ev_SS 0 ev_0).
+  apply (ev_SS 2 H).
+Qed.
+
 (** We can also prove theorems that have hypotheses involving [ev]. *)
 
 Theorem ev_plus4 : forall n, ev n -> ev (4 + n).
@@ -159,7 +174,9 @@ Proof.
   intros n.
   induction n as [| n' IHn].
   - simpl. apply ev_0.
-  - simpl. apply ev_SS. apply IHn.
+  - simpl.
+    Print ev_SS.
+    apply ev_SS. apply IHn.
 Qed.
 (** [] *)
 
@@ -210,7 +227,10 @@ Proof.
   - (* E = ev_0 : ev 0 *)
     left. reflexivity.
   - (* E = ev_SS n' E' : ev (S (S n')) *)
-    right. exists n'. split. reflexivity. apply E'.
+    right.
+    Check E. Check (ev (S (S n'))).
+    Check (ev_SS n' E'). Check (ev (S (S n'))).
+    exists n'. split. reflexivity. apply E'.
 Qed.
 
 (** The following theorem can easily be proved using [destruct] on
@@ -221,7 +241,9 @@ Theorem ev_minus2 : forall n,
 Proof.
   intros n E.
   destruct E as [| n' E'] eqn:EE.
-  - (* E = ev_0 *) simpl. apply ev_0.
+  - (* E = ev_0 *)
+    Print Nat.pred.
+    simpl. apply ev_0.
   - (* E = ev_SS n' E' *) simpl. apply E'.
 Qed.
 
@@ -327,7 +349,11 @@ Theorem one_not_even' : ~ ev 1.
 Theorem SSSSev__even : forall n,
   ev (S (S (S (S n)))) -> ev n.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n H.
+  inversion H.
+  inversion H1.
+  apply H3.
+Qed.
 (** [] *)
 
 (** **** Exercise: 1 star, standard (ev5_nonsense) 
@@ -337,7 +363,11 @@ Proof.
 Theorem ev5_nonsense :
   ev 5 -> 2 + 2 = 9.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros H.
+  inversion H.
+  inversion H1.
+  inversion H3.
+Qed.
 (** [] *)
 
 (** The [inversion] tactic does quite a bit of work. For
@@ -459,7 +489,7 @@ Lemma ev_even : forall n,
   ev n -> even n.
 Proof.
   intros n E.
-  induction E as [|n' E' IH].
+  induction E as [| n' E' IH].
   - (* E = ev_0 *)
     exists 0. reflexivity.
   - (* E = ev_SS n' E'
@@ -482,7 +512,9 @@ Theorem ev_even_iff : forall n,
 Proof.
   intros n. split.
   - (* -> *) apply ev_even.
-  - (* <- *) unfold even. intros [k Hk]. rewrite Hk. apply ev_double.
+  - (* <- *) unfold even. intros [k Hk]. rewrite Hk.
+    Check ev_double.
+    apply ev_double.
 Qed.
 
 (** As we will see in later chapters, induction on evidence is a
@@ -496,7 +528,18 @@ Qed.
 (** **** Exercise: 2 stars, standard (ev_sum)  *)
 Theorem ev_sum : forall n m, ev n -> ev m -> ev (n + m).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n m.
+  intros He.
+  generalize dependent m.
+  induction He as [| n' He' IHe].
+  - intros. apply H.
+  - intros. simpl.
+    Search "evSS".
+    Search ( ev ?a -> ev (S (S ?a))).
+    apply ev_SS.
+    apply IHe.
+    apply H.
+Qed.
 (** [] *)
 
 (** **** Exercise: 4 stars, advanced, optional (ev'_ev) 
@@ -515,9 +558,21 @@ Inductive ev' : nat -> Prop :=
     applying theorems to arguments, and note that the same technique
     works with constructors of inductively defined propositions. *)
 
+Lemma ev'_ev_left : forall n, ev' n -> ev n.
+Proof.
+  intros n H.
+  induction H.
+  - apply ev_0.
+  - Print ev.
+    apply (ev_SS 0 ev_0).
+  - apply (ev_sum n m IHev'1 IHev'2).
+Qed.
+
+
 Theorem ev'_ev : forall n, ev' n <-> ev n.
 Proof.
- (* FILL IN HERE *) Admitted.
+
+
 (** [] *)
 
 (** **** Exercise: 3 stars, advanced, especially useful (ev_ev__ev) 
