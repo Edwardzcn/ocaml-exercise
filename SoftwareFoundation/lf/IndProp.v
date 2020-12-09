@@ -830,45 +830,79 @@ Qed.
 Theorem add_le_cases : forall n m p q,
     n + m <= p + q -> n <= p \/ m <= q.
 Proof.
-  intros n.
-  induction n.
-  - intros. left. apply O_le_n.
-  - intros. 
-    assert (n + m <= S n + m).
-    {
-      Search ( ?a <= ?b -> _ + _ <= _).
-      apply (Plus.plus_le_compat_r n (S n) m).
-      apply le_S.
-      apply le_n.
-    }
-    apply (le_trans (n+m) (S n +m) (p + q)) in H0.
-    + apply IHn in H0.
+  (* TODO *)
+  intros.
+  Search "le_gt_cases".
+  destruct (PeanoNat.Nat.le_gt_cases n p) as [H1 | H1]. now left.
+  destruct (PeanoNat.Nat.le_gt_cases m q) as [H2 | H2]. now right.
+  contradict H.
+  rewrite PeanoNat.Nat.nle_gt.
+  Search "add_lt_mono".
+  now apply (PeanoNat.Nat.add_lt_mono).
+Qed.
 
 Theorem lt_S : forall n m,
   n < m ->
   n < S m.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  unfold lt.
+  intros.
+  Search "le_tran".
+  apply (le_trans (S n) m (S m)).
+  - apply H.
+  - apply le_S. apply le_n.
+Qed.
 
 Theorem plus_lt : forall n1 n2 m,
   n1 + n2 < m ->
   n1 < m /\ n2 < m.
 Proof.
-(* FILL IN HERE *) Admitted.
+  unfold lt.
+  intros.
+  split.
+  - (* try forward reasoning *)
+    rewrite plus_comm in H.
+    Search (S (_ +_ )= _).
+    rewrite plus_n_Sm in H.
+    Search (_ + _ <= _).
+    rewrite plus_comm in H.
+    apply plus_le_one in H.
+    apply H.
+  - (* try backward reasoning *)
+    apply (plus_le_one (S n2) n1 ).
+    rewrite plus_comm.
+    rewrite <- plus_n_Sm.
+    apply H.
+Qed.
 
 Theorem leb_complete : forall n m,
   n <=? m = true -> n <= m.
 Proof.
-  (* FILL IN HERE *) Admitted.
-
+  intros.
+  generalize dependent m.
+  induction n.
+  - intros. apply O_le_n.
+  - destruct m.
+    + intros. simpl in H. discriminate H.
+    + intros. simpl in H. apply IHn in H.
+      now apply n_le_m__Sn_le_Sm.
+Qed.
 (** Hint: The next one may be easiest to prove by induction on [m]. *)
 
 Theorem leb_correct : forall n m,
   n <= m ->
   n <=? m = true.
 Proof.
-  (* FILL IN HERE *) Admitted.
-
+  intros.
+  generalize dependent m.
+  induction n.
+  - intros. simpl. reflexivity.
+  - destruct m.
+    + intros. inversion H.
+    + intros. simpl.
+      apply IHn.
+      now apply Sn_le_Sm__n_le_m.
+Qed.
 (** Hint: The next one can easily be proved without using [induction]. *)
 
 Theorem leb_true_trans : forall n m o,
