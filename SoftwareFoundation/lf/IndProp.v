@@ -568,11 +568,20 @@ Proof.
   - apply (ev_sum n m IHev'1 IHev'2).
 Qed.
 
+Lemma ev'_ev_right : forall n, ev n -> ev' n.
+Proof.
+  intros.
+  induction H.
+  - apply ev'_0.
+  - apply (ev'_sum 2 n ev'_2 IHev).
+Qed.
 
 Theorem ev'_ev : forall n, ev' n <-> ev n.
 Proof.
-
-
+  split.
+  - apply ev'_ev_left.
+  - apply ev'_ev_right.
+Qed.
 (** [] *)
 
 (** **** Exercise: 3 stars, advanced, especially useful (ev_ev__ev) 
@@ -583,7 +592,16 @@ Proof.
 Theorem ev_ev__ev : forall n m,
   ev (n+m) -> ev n -> ev m.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n m Hsum H.
+  generalize dependent m.
+  induction H.
+  - intros. simpl in Hsum. apply Hsum.
+  - intros. simpl in Hsum.
+    apply IHev.
+    Search ( ev (S(S ?a)) -> ev ?a).
+    apply evSS_ev.
+    apply Hsum.
+Qed.
 (** [] *)
 
 (** **** Exercise: 3 stars, standard, optional (ev_plus_plus) 
@@ -595,7 +613,24 @@ Proof.
 Theorem ev_plus_plus : forall n m p,
   ev (n+m) -> ev (n+p) -> ev (m+p).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros.
+  Search (ev ?a -> ev ?b -> ev _).
+  assert (ev (n+m+(n+p))).
+  { apply (ev_sum (n+m) (n+p)). apply H. apply H0. }
+  Check plus_comm.
+  rewrite (plus_comm n p) in H1.
+  rewrite plus_assoc in H1.
+  rewrite plus_comm in H1.
+  rewrite plus_assoc in H1.
+  rewrite plus_assoc in H1.
+  Check plus_assoc.
+  rewrite <- (plus_assoc (n+n) m p) in H1.
+  apply (ev_ev__ev (n+n) (m+p)).
+  - apply H1.
+  - Check double_plus.
+    rewrite <- double_plus.
+    apply ev_double.
+Qed.
 (** [] *)
 
 (* ################################################################# *)
@@ -718,40 +753,96 @@ Inductive next_ev : nat -> nat -> Prop :=
 
 Lemma le_trans : forall m n o, m <= n -> n <= o -> m <= o.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros m n o H1 H2.
+  induction H2.
+  - assumption.
+  - apply le_S. apply IHle.
+Qed.
 
 Theorem O_le_n : forall n,
   0 <= n.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n.
+  induction n.
+  - reflexivity.
+  - apply le_S. apply IHn.
+Qed.
 
 Theorem n_le_m__Sn_le_Sm : forall n m,
   n <= m -> S n <= S m.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n m H1.
+  induction H1.
+  - reflexivity.
+  - apply le_S. apply IHle.
+Qed.
 
 Theorem Sn_le_Sm__n_le_m : forall n m,
   S n <= S m -> n <= m.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n m H1.
+  inversion H1.
+  - apply le_n.
+  - apply (le_trans n (S n) m).
+    + apply le_S. apply le_n.
+    + apply H0.
+Qed.
 
 Theorem le_plus_l : forall a b,
   a <= a + b.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros a b.
+  induction b.
+  - Search (_ + 0 = _).
+    rewrite PeanoNat.Nat.add_0_r.
+    apply le_n.
+  - rewrite plus_comm.
+    simpl.
+    rewrite plus_comm.
+    apply (le_trans a (a+b) (S (a+b) )).
+    + apply IHb.
+    + apply le_S. apply (le_n (a+b)).
+Qed.
+
+Lemma plus_le_one : forall n1 n2 m,
+    n1 + n2 <= m -> n1 <= m.
+Proof.
+  intros n1 n2 m H.
+  induction H.
+  - apply le_plus_l.
+  - apply (le_trans n1 m (S m)).
+    + apply IHle.
+    + Search (_ <= S _).
+      apply le_S. apply le_n.
+Qed.
 
 Theorem plus_le : forall n1 n2 m,
   n1 + n2 <= m ->
   n1 <= m /\ n2 <= m.
 Proof.
- (* FILL IN HERE *) Admitted.
-
+  intros n1 n2 m H.
+  split.
+  - apply (plus_le_one n1 n2 m). apply H.
+  - rewrite plus_comm in H. apply (plus_le_one n2 n1 m). apply H.
+Qed.
 (** Hint: the next one may be easiest to prove by induction on [n]. *)
 
 Theorem add_le_cases : forall n m p q,
     n + m <= p + q -> n <= p \/ m <= q.
 Proof.
-(* FILL IN HERE *) Admitted.
+  intros n.
+  induction n.
+  - intros. left. apply O_le_n.
+  - intros. 
+    assert (n + m <= S n + m).
+    {
+      Search ( ?a <= ?b -> _ + _ <= _).
+      apply (Plus.plus_le_compat_r n (S n) m).
+      apply le_S.
+      apply le_n.
+    }
+    apply (le_trans (n+m) (S n +m) (p + q)) in H0.
+    + apply IHn in H0.
 
 Theorem lt_S : forall n m,
   n < m ->
