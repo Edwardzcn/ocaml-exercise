@@ -908,14 +908,21 @@ Qed.
 Theorem leb_true_trans : forall n m o,
   n <=? m = true -> m <=? o = true -> n <=? o = true.
 Proof.
-  (* FILL IN HERE *) Admitted.
-(** [] *)
-
+  intros.
+  apply leb_complete in H.
+  apply leb_complete in H0.
+  apply leb_correct.
+  apply (le_trans n m o H H0 ).
+Qed.
 (** **** Exercise: 2 stars, standard, optional (leb_iff)  *)
 Theorem leb_iff : forall n m,
   n <=? m = true <-> n <= m.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  split.
+  (* use leb_complete and leb_correct *)
+  apply leb_complete.
+  apply leb_correct.
+Qed.
 (** [] *)
 
 Module R.
@@ -937,13 +944,19 @@ Inductive R : nat -> nat -> nat -> Prop :=
       - [R 1 1 2]
       - [R 2 2 6]
 
+      (* Answer : [R 1 1 2] is provable. [R 2 2 6] isn't *)
+
     - If we dropped constructor [c5] from the definition of [R],
       would the set of provable propositions change?  Briefly (1
       sentence) explain your answer.
 
+      (* Answer : not change. *)
+
     - If we dropped constructor [c4] from the definition of [R],
       would the set of provable propositions change?  Briefly (1
       sentence) explain your answer. *)
+
+      (* Answer : not change *)
 
 (* FILL IN HERE *)
 
@@ -957,12 +970,37 @@ Definition manual_grade_for_R_provability : option (nat*string) := None.
     Figure out which function; then state and prove this equivalence
     in Coq? *)
 
-Definition fR : nat -> nat -> nat
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Definition fR : nat -> nat -> nat :=
+  plus.
 
 Theorem R_equiv_fR : forall m n o, R m n o <-> fR m n = o.
 Proof.
-(* FILL IN HERE *) Admitted.
+  intros.
+  split.
+  - (* ---> *)
+    unfold fR.
+    intros H.
+    induction H.
+    + reflexivity.
+    + simpl. now rewrite IHR.
+    + rewrite <- plus_n_Sm. now rewrite IHR.
+    + simpl in IHR. rewrite <- plus_n_Sm in IHR. now injection IHR as H1.
+    + now rewrite plus_comm.
+  - (* <--- *)
+    unfold fR.
+    generalize dependent o.
+    induction m.
+    + induction n.
+      * intros. simpl in H. rewrite <- H. apply c1.
+      * simpl in IHn.
+        intros. rewrite <- H. simpl.
+        apply c3.
+        apply IHn.
+        reflexivity.
+    + intros.
+      rewrite <- H. simpl. apply c2.
+      apply IHm. reflexivity.
+Qed.
 (** [] *)
 
 End R.

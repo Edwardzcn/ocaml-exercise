@@ -65,6 +65,8 @@ Print Init.Nat.add.
     internally uses the function [string_dec] from Coq's string
     library. *)
 
+Check string_dec.
+
 Definition eqb_string (x y : string) : bool :=
   if string_dec x y then true else false.
 
@@ -103,7 +105,7 @@ Proof.
      + intros H. exfalso. apply Hs_not_eq. apply H.
 Qed.
 
-(** Similarly: *)
+(** cSimilarly: *)
 
 Theorem eqb_string_false_iff : forall x y : string,
     eqb_string x y = false <-> x <> y.
@@ -225,7 +227,10 @@ Proof. reflexivity. Qed.
 Lemma t_apply_empty : forall (A : Type) (x : string) (v : A),
     (_ !-> v) x = v.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  unfold t_empty.
+  reflexivity.
+Qed.
+
 (** [] *)
 
 (** **** Exercise: 2 stars, standard, optional (t_update_eq) 
@@ -237,7 +242,13 @@ Proof.
 Lemma t_update_eq : forall (A : Type) (m : total_map A) x v,
     (x !-> v ; m) x = v.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  Locate "!->".
+  intros.
+  unfold t_update.
+  Search (eqb_string ?A ?A).
+  rewrite <- eqb_string_refl.
+  reflexivity.
+Qed.
 (** [] *)
 
 (** **** Exercise: 2 stars, standard, optional (t_update_neq) 
@@ -250,7 +261,13 @@ Theorem t_update_neq : forall (A : Type) (m : total_map A) x1 x2 v,
     x1 <> x2 ->
     (x1 !-> v ; m) x2 = m x2.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros.
+  unfold t_update.
+  Search "eqb_string".
+  apply false_eqb_string in H.
+  rewrite H.
+  reflexivity.
+Qed.
 (** [] *)
 
 (** **** Exercise: 2 stars, standard, optional (t_update_shadow) 
@@ -264,7 +281,16 @@ Proof.
 Lemma t_update_shadow : forall (A : Type) (m : total_map A) x v1 v2,
     (x !-> v2 ; x !-> v1 ; m) = (x !-> v2 ; m).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* function eq function *)
+  intros.
+  Print functional_extensionality.
+  apply functional_extensionality.
+  unfold t_update.
+  intros x0.
+  destruct (eqb_string x x0) eqn:He.
+  - reflexivity.
+  - reflexivity.
+Qed.
 (** [] *)
 
 (** For the final two lemmas about total maps, it's convenient to use
@@ -280,7 +306,13 @@ Proof.
 Lemma eqb_stringP : forall x y : string,
     reflect (x = y) (eqb_string x y).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  Print reflect.
+  intros.
+  apply iff_reflect.
+  split.
+  - intros. rewrite H. now rewrite <- eqb_string_refl.
+  - intros. apply eqb_string_true_iff. apply H.
+Qed.
 (** [] *)
 
 (** Now, given [string]s [x1] and [x2], we can use the tactic
@@ -299,7 +331,15 @@ Proof.
 Theorem t_update_same : forall (A : Type) (m : total_map A) x,
     (x !-> m x ; m) = m.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros.
+  apply functional_extensionality.
+  unfold t_update.
+  intros.
+  destruct (eqb_string x x0) eqn:He.
+  - apply eqb_string_true_iff in He.
+    now rewrite He.
+  - reflexivity.
+Qed.
 (** [] *)
 
 (** **** Exercise: 3 stars, standard, especially useful (t_update_permute) 
@@ -315,6 +355,7 @@ Theorem t_update_permute : forall (A : Type) (m : total_map A)
     =
     (x2 !-> v2 ; x1 !-> v1 ; m).
 Proof.
+  (* TODO *)
   (* FILL IN HERE *) Admitted.
 (** [] *)
 
@@ -358,7 +399,8 @@ Qed.
 Lemma update_eq : forall (A : Type) (m : partial_map A) x v,
     (x |-> v ; m) x = Some v.
 Proof.
-  intros. unfold update. rewrite t_update_eq.
+  intros. unfold update.
+  rewrite t_update_eq.
   reflexivity.
 Qed.
 
