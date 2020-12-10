@@ -91,6 +91,8 @@ Print ev_4.
 (** Indeed, we can also write down this proof object _directly_,
     without the need for a separate proof script: *)
 
+Check (ev_SS 2 (ev_SS 0 ev_0)).
+
 Check (ev_SS 2 (ev_SS 0 ev_0))
   : ev 4.
 
@@ -133,13 +135,13 @@ Qed.
 
 Theorem ev_4'' : ev 4.
 Proof.
-  Show Proof.
+  Show Proof.                   (* ?Goal *)
   apply ev_SS.
-  Show Proof.
+  Show Proof.                   (* (ev_SS 2 ?Goal) *)
   apply ev_SS.
-  Show Proof.
+  Show Proof.                   (* (ev_SS 2 (ev_SS 0 ?Goal)) *)
   apply ev_0.
-  Show Proof.
+  Show Proof.                   (* (ev_SS 2 (ev_SS 0 ev_0)) *)
 Qed.
 
 (** At any given moment, Coq has constructed a term with a
@@ -178,10 +180,16 @@ Print ev_4'''.
 
 Theorem ev_8 : ev 8.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  apply ev_SS.
+  Show Proof.
+  apply ev_SS.
+  apply ev_4.
+  Show Proof.
+Qed.
 
-Definition ev_8' : ev 8
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+
+Definition ev_8' : ev 8 :=
+  (ev_SS 6 (ev_SS 4 ev_4)).
 (** [] *)
 
 (* ################################################################# *)
@@ -206,6 +214,8 @@ Proof.
   apply ev_SS.
   apply H.
 Qed.
+
+Print ev_plus4.
 
 (** What is the proof object corresponding to [ev_plus4]?
 
@@ -253,10 +263,27 @@ Check ev_plus4''
         =  nat -> nat
 *)
 
+(* my *)
+
+Theorem ev_plus2_theorem : forall n, ev n -> ev (n+2).
+Proof.
+  intros.
+  apply ev_SS in H.
+  rewrite plus_comm.
+  apply H.
+  Show Proof.
+Qed.
+
+Check ev_plus2_theorem.
+
 (** For example, consider this proposition: *)
+
+(* Note: here [:] followed with [Prop], different from the   *)
 
 Definition ev_plus2 : Prop :=
   forall n, forall (E : ev n), ev (n + 2).
+
+Print ev_plus2.
 
 (** A proof term inhabiting this proposition would be a function
     with two arguments: a number [n] and some evidence [E] that [n] is
@@ -289,7 +316,10 @@ intro n.
 Show Proof.
 apply S.
 Show Proof.
-apply n. Defined.
+apply n.
+Show Proof.
+(* Qed. *)
+Defined.                        (* not Qed. *)
 
 Print add1.
 (* ==>
@@ -350,6 +380,9 @@ Print prod.
    Inductive prod (X Y : Type) : Type :=
    | pair : X -> Y -> X * Y. *)
 
+Print and.
+(* Inductive and (P Q : Prop) : Prop :=  conj : P -> Q -> P /\ Q *)
+
 (** This similarity should clarify why [destruct] and [intros]
     patterns can be used on a conjunctive hypothesis.  Case analysis
     allows us to consider all possible ways in which [P /\ Q] was
@@ -377,6 +410,7 @@ Proof.
     + apply HQ.
 Qed.
 
+Print and_comm.
 End And.
 
 (** This shows why the inductive definition of [and] can be
@@ -388,15 +422,49 @@ Definition and_comm'_aux P Q (H : P /\ Q) : Q /\ P :=
   | conj HP HQ => conj HQ HP
   end.
 
+Print and_comm.
+
 Definition and_comm' P Q : P /\ Q <-> Q /\ P :=
   conj (and_comm'_aux P Q) (and_comm'_aux Q P).
 
-(** **** Exercise: 2 stars, standard (conj_fact) 
+(* my test *)
+
+(* Definition ev_plus4' : forall n, ev n -> ev (4 + n) := *)
+(*   fun (n : nat) => fun (H : ev n) => *)
+(*     ev_SS (S (S n)) (ev_SS n H). *)
+
+(* Definition ev_plus4'' (n : nat) (H : ev n) *)
+(*                     : ev (4 + n) := *)
+(*   ev_SS (S (S n)) (ev_SS n H). *)
+
+Definition and_comm'' : forall (P:Prop) (Q:Prop), P /\ Q <-> Q /\ P :=
+  fun (P:Prop) => fun (Q:Prop) =>
+              conj( fun H : P /\ Q => match H with
+                                 | conj P Q => conj Q P
+                                 end)
+                  ( fun H : Q /\ P => match H with
+                                  | conj P Q => conj Q P
+                                  end ).
+Print and_comm.
+Print and_comm''.
+Check @and_comm.
+Check @and_comm'_aux.
+Print and_comm'.
+
+(** **** Exercise: 2 stars, standard (conj_fact)
 
     Construct a proof object for the following proposition. *)
 
-Definition conj_fact : forall P Q R, P /\ Q -> Q /\ R -> P /\ R
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Definition conj_fact : forall P Q R, P /\ Q -> Q /\ R -> P /\ R :=
+  fun (P Q R : Prop) =>
+    fun (H1 : P /\ Q) =>
+      fun (H2 : Q /\ R) =>
+        match H1 with
+        | conj P Q =>
+          match H2 with
+          | conj Q R => conj P R
+          end
+        end.
 (** [] *)
 
 (* ================================================================= *)
@@ -431,6 +499,9 @@ Proof.
   intros P Q HP. left. apply HP.
 Qed.
 
+Print inj_l'.
+Check inj_l'.
+
 Definition or_elim : forall (P Q R : Prop), (P \/ Q) -> (P -> R) -> (Q -> R) -> R :=
   fun P Q R HPQ HPR HQR =>
     match HPQ with
@@ -452,8 +523,16 @@ End Or.
 
     Construct a proof object for the following proposition. *)
 
-Definition or_commut' : forall P Q, P \/ Q -> Q \/ P
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Search "or_commut".
+Print or_commut.
+
+Definition or_commut' : forall P Q, P \/ Q -> Q \/ P :=
+  fun (P Q :Prop) =>
+    fun (H : P \/ Q) =>
+      match H with
+      | or_introl HP => or_intror HP
+      | or_intror HQ => or_introl HQ
+      end.
 (** [] *)
 
 (* ================================================================= *)
@@ -494,12 +573,16 @@ Check ex (fun n => ev n) : Prop.
 Definition some_nat_is_even : exists n, ev n :=
   ex_intro ev 4 (ev_SS 2 (ev_SS 0 ev_0)).
 
-(** **** Exercise: 2 stars, standard (ex_ev_Sn) 
+(* my *)
+Definition some_nat_is_even' : ex (fun n => ev n) :=
+  ex_intro ev 2 (ev_SS 0 ev_0).
+
+(** **** Exercise: 2 stars, standard (ex_ev_Sn)
 
     Construct a proof object for the following proposition. *)
 
-Definition ex_ev_Sn : ex (fun n => ev (S n))
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Definition ex_ev_Sn : ex (fun n => ev (S n)) :=
+  ex_intro (fun n : nat => ev (S n)) 1 (ev_SS 0 ev_0).
 (** [] *)
 
 (* ================================================================= *)
@@ -517,8 +600,8 @@ Inductive True : Prop :=
 
     Construct a proof object for the following proposition. *)
 
-Definition p_implies_true : forall P, P -> True
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Definition p_implies_true : forall P, P -> True :=
+  fun P HP => I.
 (** [] *)
 
 (** [False] is equally simple -- indeed, so simple it may look
@@ -552,8 +635,8 @@ Definition false_implies_zero_eq_one : False -> 0 = 1 :=
 
     Construct a proof object for the following proposition. *)
 
-Definition ex_falso_quodlibet' : forall P, False -> P
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Definition ex_falso_quodlibet' : forall P, False -> P :=
+  fun P contra => match contra with end.
 (** [] *)
 
 End Props.
@@ -600,6 +683,13 @@ Proof.
   apply eq_refl.
 Qed.
 
+(* my *)
+(* Fail Lemma for_neq_five: 2 + 2 == 1 + 4. *)
+(* Proof. *)
+(*   apply eq_refl. *)
+(* Qed. *)
+
+
 (** The [reflexivity] tactic that we have used to prove
     equalities up to now is essentially just shorthand for [apply
     eq_refl].
@@ -626,7 +716,12 @@ Definition singleton : forall (X:Type) (x:X), []++[x] == x::[]  :=
 Lemma equality__leibniz_equality : forall (X : Type) (x y: X),
   x == y -> forall P:X->Prop, P x -> P y.
 Proof.
-(* FILL IN HERE *) Admitted.
+  intros X x y H.
+  induction H.
+  intros P HP.
+  apply HP.
+  Show Proof.
+Qed.
 (** [] *)
 
 (** **** Exercise: 3 stars, standard, optional (leibniz_equality__equality) 
@@ -639,8 +734,13 @@ Proof.
 Lemma leibniz_equality__equality : forall (X : Type) (x y: X),
   (forall P:X->Prop, P x -> P y) -> x == y.
 Proof.
-(* FILL IN HERE *) Admitted.
-
+  intros X x y H.
+  Check (eq x x).
+  Check (eq x y).
+  Check (H (eq x)).
+  apply (H (eq x)).
+  apply eq_refl.
+Qed.
 (** [] *)
 
 End MyEquality.
