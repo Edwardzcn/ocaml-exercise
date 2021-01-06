@@ -2078,3 +2078,22 @@ Qed.
     [] *)
 
 (* 2020-09-09 20:51 *)
+
+(* My exercise *)
+Theorem tri_resolution : forall a b c d: Prop,
+   excluded_middle -> (a -> (b /\ c)) /\ ( (not a) -> (b /\ d)) -> b.
+Proof.
+  intros a b c d em [H1 H2].
+  unfold excluded_middle in em.
+  assert (a \/ ~ a).
+  { apply em. }
+  destruct  H as  [H | H].
+  - apply H1 in H.
+    destruct H as [H _].
+    assumption.
+  - apply H2 in H.
+    destruct H as [H _].
+    assumption.
+Qed.
+
+Print tri_resolution.

@@ -207,7 +207,12 @@ Definition ev_8' : ev 8 :=
 
 (** For example, consider this statement: *)
 
+(* Set Printing All. *)
+
+
+  (* forall (n : nat) (_ : ev n), ev (Nat.add (S (S (S (S O)))) n) *)
 Theorem ev_plus4 : forall n, ev n -> ev (4 + n).
+ forall n : nat, ev n -> ev (4 + n)
 Proof.
   intros n H. simpl.
   apply ev_SS.
@@ -241,6 +246,8 @@ Check ev_plus4''
   : forall n : nat,
     ev n ->
     ev (4 + n).
+
+Print ev_plus4''.
 
 (** When we view the proposition being proved by [ev_plus4] as a
     function type, one interesting point becomes apparent: The second
