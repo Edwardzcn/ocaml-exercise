@@ -212,7 +212,6 @@ Definition ev_8' : ev 8 :=
 
   (* forall (n : nat) (_ : ev n), ev (Nat.add (S (S (S (S O)))) n) *)
 Theorem ev_plus4 : forall n, ev n -> ev (4 + n).
- forall n : nat, ev n -> ev (4 + n)
 Proof.
   intros n H. simpl.
   apply ev_SS.
